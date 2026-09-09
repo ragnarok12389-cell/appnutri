@@ -340,5 +340,23 @@ describe('Supabase Migrations & Schema Architecture', () => {
     expect(sql).toContain('REVOKE ALL ON FUNCTION public.claim_ai_pending_action');
     expect(sql).toContain('TO service_role');
   });
-});
 
+  it('should define append-only progress history and server-only adjustment RPCs in migration 19', () => {
+    const sql = fs.readFileSync(
+      path.join(migrationsDir, '20260909000019_progress_feedback_adjustments.sql'),
+      'utf-8'
+    );
+
+    expect(sql).toContain('TABLE public.patient_check_ins');
+    expect(sql).toContain('TABLE public.progress_analyses');
+    expect(sql).toContain('TABLE public.adjustment_proposals');
+    expect(sql).toContain('TABLE public.adjustment_proposal_reviews');
+    expect(sql).toContain('private.block_progress_history_mutation');
+    expect(sql).toContain('private.can_view_patient_progress');
+    expect(sql).toContain('FUNCTION public.persist_progress_analysis_atomic');
+    expect(sql).toContain('FUNCTION public.review_adjustment_proposal');
+    expect(sql).toContain('pg_advisory_xact_lock');
+    expect(sql).toContain('FROM PUBLIC, anon, authenticated');
+    expect(sql).toContain('TO service_role');
+  });
+});

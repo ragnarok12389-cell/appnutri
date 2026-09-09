@@ -16,6 +16,7 @@ import {
   Clock,
   Apple,
   AlertTriangle,
+  Activity,
 } from 'lucide-react';
 import { getNutritionProfileForPatientAction } from '@/app/actions/nutrition-profile';
 import { getLatestNutritionTargetAction } from '@/app/actions/nutrition-engine';
@@ -95,13 +96,16 @@ export default async function PatientDetailsPage({ params }: Props) {
             Vínculo autorizado pelo sistema e validado via Row Level Security (<code className="text-zinc-300">private.can_access_patient</code>).
           </p>
         </div>
-        <Link
-          href="/professional/patients"
-          className="inline-flex items-center space-x-1.5 text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-800 bg-zinc-900 px-3 py-1.5 rounded-lg transition-colors"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Voltar para Pacientes</span>
-        </Link>
+        <div className="flex flex-wrap justify-end gap-2">
+          {(user.profile.role_id === 'nutritionist' || user.profile.role_id === 'admin') && <Link href={`/professional/patients/${patientId}/progress`} className="inline-flex items-center space-x-1.5 text-xs text-emerald-400 hover:text-emerald-300 border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 rounded-lg transition-colors"><Activity className="w-3.5 h-3.5" /><span>Ver progresso</span></Link>}
+          <Link
+            href="/professional/patients"
+            className="inline-flex items-center space-x-1.5 text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-800 bg-zinc-900 px-3 py-1.5 rounded-lg transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Voltar para Pacientes</span>
+          </Link>
+        </div>
       </div>
 
       {/* Grid de Informações Básicas */}

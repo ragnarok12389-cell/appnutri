@@ -122,6 +122,14 @@ export interface WorkoutContextPack {
 export interface ProgressContextPack {
   recent_sessions_completed: number;
   last_logged_session_date?: string;
+  data_quality?: 'insufficient' | 'partial' | 'sufficient';
+  check_in_count?: number;
+  weight_change_kg?: number | null;
+  average_hunger?: number | null;
+  average_energy?: number | null;
+  average_nutrition_adherence?: number | null;
+  average_workout_adherence?: number | null;
+  pending_review_count?: number;
 }
 
 export interface ConversationContextPack {

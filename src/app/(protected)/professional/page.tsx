@@ -97,7 +97,7 @@ export default async function ProfessionalPage() {
         </h2>
         <p className="text-xs text-zinc-300 leading-relaxed">
           {isNutri
-            ? 'Como Nutricionista credenciado, seu perfil possui permissões clínicas para criar e editar dietas (`nutrition.edit`) e fichas de treinamento (`workout.edit`).'
+            ? 'Como Nutricionista credenciado, seu perfil possui permissões clínicas para criar e editar dietas. A prescrição de treino exige profissional de Educação Física habilitado.'
             : 'Como Influenciador, seu perfil gerencia comunidades e referências de alunos. A prescrição clínica não é permitida por padrão via RBAC.'}
         </p>
       </div>

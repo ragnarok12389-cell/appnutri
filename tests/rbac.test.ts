@@ -31,7 +31,7 @@ describe('RBAC Foundation & Role Distinctness', () => {
 
     // Nutritionist MUST have clinical editing capabilities
     expect(nutriPerms).toContain('nutrition.edit');
-    expect(nutriPerms).toContain('workout.edit');
+    expect(nutriPerms).not.toContain('workout.edit');
     expect(nutriPerms).toContain('patient.edit');
 
     // Influencer MUST NOT have clinical editing capabilities

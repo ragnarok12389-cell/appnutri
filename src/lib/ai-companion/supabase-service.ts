@@ -18,6 +18,7 @@ import { ComposerCandidateFood } from '@/lib/diet-composer/types';
 import { WorkoutConstraints } from '@/types/workout-engine';
 import { ToolDataServices } from './tools';
 import { applySubstitutionAction } from '@/app/actions/diet-plan';
+import { runProgressAnalysisForPatient } from '@/lib/progress-engine/service';
 
 export class SupabaseContextDataSource implements ContextDataSource {
   private supabase = createAdminClient();
@@ -228,18 +229,33 @@ export class SupabaseContextDataSource implements ContextDataSource {
   }
 
   public async getProgress(patientId: string): Promise<ProgressContextPack> {
-    const { data: logs } = await this.supabase
-      .from('workout_execution_logs')
-      .select('session_date')
-      .eq('patient_id', patientId)
-      .order('session_date', { ascending: false })
-      .limit(10);
+    const [logsResult, analysisResult, proposalsResult] = await Promise.all([
+      this.supabase.from('workout_execution_logs').select('session_date').eq('patient_id', patientId)
+        .order('session_date', { ascending: false }).limit(10),
+      this.supabase.from('progress_analyses').select('data_quality, metrics').eq('patient_id', patientId)
+        .order('created_at', { ascending: false }).limit(1).maybeSingle(),
+      this.supabase.from('adjustment_proposals').select('id', { count: 'exact', head: true })
+        .eq('patient_id', patientId).eq('status', 'pending_review'),
+    ]);
 
-    const dates = new Set((logs ?? []).map((l) => l.session_date));
+    if (logsResult.error || analysisResult.error || proposalsResult.error) {
+      throw new Error('Resumo autoritativo de progresso indisponível.');
+    }
+
+    const dates = new Set((logsResult.data ?? []).map((log) => log.session_date));
+    const metrics = (analysisResult.data?.metrics ?? {}) as Record<string, number | null>;
 
     return {
-      recent_sessions_completed: dates.size,
-      last_logged_session_date: logs?.[0]?.session_date,
+      recent_sessions_completed: Number(metrics.workouts_completed ?? dates.size),
+      last_logged_session_date: logsResult.data?.[0]?.session_date,
+      data_quality: analysisResult.data?.data_quality,
+      check_in_count: Number(metrics.check_in_count ?? 0),
+      weight_change_kg: metrics.weight_change_kg ?? null,
+      average_hunger: metrics.average_hunger ?? null,
+      average_energy: metrics.average_energy ?? null,
+      average_nutrition_adherence: metrics.average_nutrition_adherence ?? null,
+      average_workout_adherence: metrics.average_workout_adherence ?? null,
+      pending_review_count: proposalsResult.count ?? 0,
     };
   }
 
@@ -502,6 +518,12 @@ export class SupabaseToolDataServices implements ToolDataServices {
 
     if (error || !data) {
       throw new Error(`Falha ao registrar feedback: ${error?.message}`);
+    }
+
+    try {
+      await runProgressAnalysisForPatient(event.patient_id);
+    } catch {
+      // O evento permanece em status recorded para reprocessamento no próximo check-in.
     }
 
     return { id: data.id, status: data.status };

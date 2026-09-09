@@ -396,13 +396,13 @@ export default async function PatientDashboardPage() {
           </div>
 
           {/* Acompanhamento */}
-          <div className="p-5 rounded-2xl border border-zinc-800/80 bg-zinc-950/40 relative overflow-hidden space-y-3">
+          <Link href="/patient/progress" className="p-5 rounded-2xl border border-emerald-500/30 bg-emerald-950/10 hover:bg-emerald-950/20 relative overflow-hidden space-y-3 transition-colors">
             <div className="flex items-center justify-between">
               <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-500">
                 <Activity className="w-5 h-5" />
               </div>
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-zinc-900 border border-zinc-800 text-zinc-400">
-                Em breve
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                Disponível
               </span>
             </div>
             <div>
@@ -411,7 +411,7 @@ export default async function PatientDashboardPage() {
                 Check-ins periódicos e registros de adesão para validação contínua.
               </p>
             </div>
-          </div>
+          </Link>
 
           {/* Evolução */}
           <div className="p-5 rounded-2xl border border-zinc-800/80 bg-zinc-950/40 relative overflow-hidden space-y-3">

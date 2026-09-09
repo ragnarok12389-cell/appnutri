@@ -71,7 +71,7 @@ export const ALL_PERMISSIONS: AppPermission[] = [
 /**
  * Matriz de permissões padrão por papel de usuário (RBAC Base).
  * Observação crucial: Nutricionista e Influencer possuem atribuições distintas!
- * O Nutricionista possui capacidade clínica ('nutrition.edit', 'workout.edit', 'nutrition_sensitive.view', 'nutrition_engine.run', 'nutrition_engine.review', 'food_prices.manage').
+ * O Nutricionista possui capacidade clínica nutricional, sem autoridade para prescrição de treino.
  * O Influenciador NÃO possui prerrogativa de execução, revisão ou visualização de dados clínicos sensíveis.
  */
 export const ROLE_DEFAULT_PERMISSIONS: Record<UserRole, AppPermission[]> = {
@@ -95,7 +95,6 @@ export const ROLE_DEFAULT_PERMISSIONS: Record<UserRole, AppPermission[]> = {
     'diet_plan.review',
     'diet_plan.edit',
     'workout.view',
-    'workout.edit',
     'progress.view',
     'ai.use',
   ],
