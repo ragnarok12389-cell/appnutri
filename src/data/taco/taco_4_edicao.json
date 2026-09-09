@@ -1,0 +1,1209 @@
+{
+  "source": {
+    "name": "TACO",
+    "version": "4.0.0",
+    "publisher": "NEPA/UNICAMP",
+    "reference": "Tabela Brasileira de Composição de Alimentos, 4ª edição revisada e ampliada, 2011.",
+    "license_notes": "Dados públicos para pesquisa e uso em saúde no Brasil com preservação de citação e atribuição."
+  },
+  "nutrients_catalog": [
+    { "code": "energy_kcal", "name": "Energia", "unit": "kcal", "category": "macro", "display_order": 1 },
+    { "code": "energy_kj", "name": "Energia", "unit": "kJ", "category": "macro", "display_order": 2 },
+    { "code": "protein_g", "name": "Proteína", "unit": "g", "category": "macro", "display_order": 3 },
+    { "code": "carbohydrate_g", "name": "Carboidrato total", "unit": "g", "category": "macro", "display_order": 4 },
+    { "code": "fat_g", "name": "Lipídios totais", "unit": "g", "category": "macro", "display_order": 5 },
+    { "code": "fiber_g", "name": "Fibra alimentar", "unit": "g", "category": "macro", "display_order": 6 },
+    { "code": "sodium_mg", "name": "Sódio", "unit": "mg", "category": "mineral", "display_order": 7 },
+    { "code": "calcium_mg", "name": "Cálcio", "unit": "mg", "category": "mineral", "display_order": 8 },
+    { "code": "iron_mg", "name": "Ferro", "unit": "mg", "category": "mineral", "display_order": 9 },
+    { "code": "potassium_mg", "name": "Potássio", "unit": "mg", "category": "mineral", "display_order": 10 },
+    { "code": "magnesium_mg", "name": "Magnésio", "unit": "mg", "category": "mineral", "display_order": 11 },
+    { "code": "zinc_mg", "name": "Zinco", "unit": "mg", "category": "mineral", "display_order": 12 },
+    { "code": "vitamin_c_mg", "name": "Vitamina C", "unit": "mg", "category": "vitamin", "display_order": 13 },
+    { "code": "cholesterol_mg", "name": "Colesterol", "unit": "mg", "category": "lipid", "display_order": 14 }
+  ],
+  "foods": [
+    {
+      "source_food_code": "001",
+      "name": "Arroz, tipo 1, cru",
+      "scientific_name": "Oryza sativa L.",
+      "food_group": "Cereais e derivados",
+      "preparation_state": "raw",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 358,
+        "energy_kj": 1497,
+        "protein_g": 7.2,
+        "fat_g": 0.3,
+        "carbohydrate_g": 78.8,
+        "fiber_g": 1.6,
+        "sodium_mg": 1,
+        "calcium_mg": 8,
+        "iron_mg": "Tr",
+        "potassium_mg": 28,
+        "magnesium_mg": 11,
+        "zinc_mg": 0.7,
+        "vitamin_c_mg": "NA",
+        "cholesterol_mg": "NA"
+      },
+      "household_measures": [
+        { "label": "1 xícara de chá cru", "grams": 200, "source": "IBGE", "is_estimated": false },
+        { "label": "1 colher de sopa cru", "grams": 15, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["arroz cru", "arroz branco cru", "arroz agulhinha cru"],
+      "categories": ["carbohydrate_source", "grain"],
+      "tags": {
+        "vegan": "true",
+        "vegetarian": "true",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "003",
+      "name": "Arroz, tipo 1, cozido",
+      "scientific_name": "Oryza sativa L.",
+      "food_group": "Cereais e derivados",
+      "preparation_state": "cooked",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 128,
+        "energy_kj": 537,
+        "protein_g": 2.5,
+        "fat_g": 0.2,
+        "carbohydrate_g": 28.1,
+        "fiber_g": 1.6,
+        "sodium_mg": 1,
+        "calcium_mg": 4,
+        "iron_mg": 0.1,
+        "potassium_mg": 16,
+        "magnesium_mg": 3,
+        "zinc_mg": 0.5,
+        "vitamin_c_mg": "NA",
+        "cholesterol_mg": "NA"
+      },
+      "household_measures": [
+        { "label": "1 colher de sopa cheia", "grams": 25, "source": "TACO", "is_estimated": false },
+        { "label": "1 concha média", "grams": 130, "source": "TACO", "is_estimated": false },
+        { "label": "1 escumadeira cheia", "grams": 100, "source": "IBGE", "is_estimated": false },
+        { "label": "1 xícara de chá", "grams": 160, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["arroz cozido", "arroz branco", "arroz pronto"],
+      "categories": ["carbohydrate_source", "grain"],
+      "tags": {
+        "vegan": "true",
+        "vegetarian": "true",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "005",
+      "name": "Arroz, integral, cozido",
+      "scientific_name": "Oryza sativa L.",
+      "food_group": "Cereais e derivados",
+      "preparation_state": "cooked",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 124,
+        "energy_kj": 517,
+        "protein_g": 2.6,
+        "fat_g": 1.0,
+        "carbohydrate_g": 25.8,
+        "fiber_g": 2.7,
+        "sodium_mg": 1,
+        "calcium_mg": 5,
+        "iron_mg": 0.3,
+        "potassium_mg": 75,
+        "magnesium_mg": 59,
+        "zinc_mg": 0.7,
+        "vitamin_c_mg": "NA",
+        "cholesterol_mg": "NA"
+      },
+      "household_measures": [
+        { "label": "1 colher de sopa cheia", "grams": 25, "source": "TACO", "is_estimated": false },
+        { "label": "1 concha média", "grams": 130, "source": "TACO", "is_estimated": false },
+        { "label": "1 xícara de chá", "grams": 160, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["arroz integral", "arroz integral cozido"],
+      "categories": ["carbohydrate_source", "grain"],
+      "tags": {
+        "vegan": "true",
+        "vegetarian": "true",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "009",
+      "name": "Aveia, flocos, crua",
+      "scientific_name": "Avena sativa L.",
+      "food_group": "Cereais e derivados",
+      "preparation_state": "raw",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 394,
+        "energy_kj": 1648,
+        "protein_g": 13.9,
+        "fat_g": 8.5,
+        "carbohydrate_g": 66.6,
+        "fiber_g": 9.1,
+        "sodium_mg": 5,
+        "calcium_mg": 48,
+        "iron_mg": 4.4,
+        "potassium_mg": 336,
+        "magnesium_mg": 119,
+        "zinc_mg": 2.6,
+        "vitamin_c_mg": "NA",
+        "cholesterol_mg": "NA"
+      },
+      "household_measures": [
+        { "label": "1 colher de sopa cheia", "grams": 18, "source": "IBGE", "is_estimated": false },
+        { "label": "1 xícara de chá", "grams": 80, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["aveia em flocos", "aveia", "flocos de aveia"],
+      "categories": ["carbohydrate_source", "grain"],
+      "tags": {
+        "vegan": "true",
+        "vegetarian": "true",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "025",
+      "name": "Pão, de trigo, francês",
+      "food_group": "Cereais e derivados",
+      "preparation_state": "industrialized",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 300,
+        "energy_kj": 1255,
+        "protein_g": 8.0,
+        "fat_g": 3.1,
+        "carbohydrate_g": 58.6,
+        "fiber_g": 2.3,
+        "sodium_mg": 648,
+        "calcium_mg": 16,
+        "iron_mg": 1.0,
+        "potassium_mg": 128,
+        "magnesium_mg": 25,
+        "zinc_mg": 0.8,
+        "vitamin_c_mg": "NA",
+        "cholesterol_mg": "NA"
+      },
+      "household_measures": [
+        { "label": "1 unidade média", "grams": 50, "source": "TACO", "is_estimated": false },
+        { "label": "1 fatia", "grams": 25, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["pão francês", "pão de sal", "pão d'água", "cacetinho"],
+      "categories": ["carbohydrate_source", "grain", "snack"],
+      "tags": {
+        "vegan": "true",
+        "vegetarian": "true",
+        "contains_gluten": "true",
+        "contains_milk": "unknown",
+        "contains_egg": "unknown",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "unknown"
+      }
+    },
+    {
+      "source_food_code": "029",
+      "name": "Macarrão, trigo, cru",
+      "food_group": "Cereais e derivados",
+      "preparation_state": "raw",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 371,
+        "energy_kj": 1553,
+        "protein_g": 10.0,
+        "fat_g": 1.3,
+        "carbohydrate_g": 77.9,
+        "fiber_g": 2.9,
+        "sodium_mg": 10,
+        "calcium_mg": 17,
+        "iron_mg": 1.2,
+        "potassium_mg": 164,
+        "magnesium_mg": 32,
+        "zinc_mg": 1.0,
+        "vitamin_c_mg": "NA",
+        "cholesterol_mg": "NA"
+      },
+      "household_measures": [
+        { "label": "1 porção crua", "grams": 80, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["macarrão cru", "massa crua", "espaguete cru"],
+      "categories": ["carbohydrate_source", "grain"],
+      "tags": {
+        "vegan": "true",
+        "vegetarian": "true",
+        "contains_gluten": "true",
+        "contains_milk": "false",
+        "contains_egg": "unknown",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "030",
+      "name": "Macarrão, trigo, cozido",
+      "food_group": "Cereais e derivados",
+      "preparation_state": "cooked",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 102,
+        "energy_kj": 427,
+        "protein_g": 3.0,
+        "fat_g": 0.4,
+        "carbohydrate_g": 21.3,
+        "fiber_g": 1.1,
+        "sodium_mg": 1,
+        "calcium_mg": 5,
+        "iron_mg": 0.3,
+        "potassium_mg": 38,
+        "magnesium_mg": 9,
+        "zinc_mg": 0.3,
+        "vitamin_c_mg": "NA",
+        "cholesterol_mg": "NA"
+      },
+      "household_measures": [
+        { "label": "1 escumadeira cheia", "grams": 110, "source": "IBGE", "is_estimated": false },
+        { "label": "1 prato fundo cheio", "grams": 250, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["macarrão cozido", "espaguete cozido", "massa cozida"],
+      "categories": ["carbohydrate_source", "grain"],
+      "tags": {
+        "vegan": "true",
+        "vegetarian": "true",
+        "contains_gluten": "true",
+        "contains_milk": "false",
+        "contains_egg": "unknown",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "053",
+      "name": "Feijão, carioca, cru",
+      "scientific_name": "Phaseolus vulgaris L.",
+      "food_group": "Leguminosas e derivados",
+      "preparation_state": "raw",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 329,
+        "energy_kj": 1378,
+        "protein_g": 20.0,
+        "fat_g": 1.3,
+        "carbohydrate_g": 61.2,
+        "fiber_g": 18.4,
+        "sodium_mg": 3,
+        "calcium_mg": 123,
+        "iron_mg": 8.0,
+        "potassium_mg": 1326,
+        "magnesium_mg": 141,
+        "zinc_mg": 2.8,
+        "vitamin_c_mg": "Tr",
+        "cholesterol_mg": "NA"
+      },
+      "household_measures": [
+        { "label": "1 xícara de chá cru", "grams": 180, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["feijão carioca cru", "feijão cru"],
+      "categories": ["legume", "carbohydrate_source", "protein_source"],
+      "tags": {
+        "vegan": "true",
+        "vegetarian": "true",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "055",
+      "name": "Feijão, carioca, cozido",
+      "scientific_name": "Phaseolus vulgaris L.",
+      "food_group": "Leguminosas e derivados",
+      "preparation_state": "cooked",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 76,
+        "energy_kj": 319,
+        "protein_g": 4.8,
+        "fat_g": 0.5,
+        "carbohydrate_g": 13.6,
+        "fiber_g": 8.5,
+        "sodium_mg": 2,
+        "calcium_mg": 27,
+        "iron_mg": 1.3,
+        "potassium_mg": 255,
+        "magnesium_mg": 41,
+        "zinc_mg": 0.7,
+        "vitamin_c_mg": "Tr",
+        "cholesterol_mg": "NA"
+      },
+      "household_measures": [
+        { "label": "1 concha média (grão e caldo)", "grams": 140, "source": "TACO", "is_estimated": false },
+        { "label": "1 colher de sopa", "grams": 20, "source": "TACO", "is_estimated": false },
+        { "label": "1 concha pequena", "grams": 90, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["feijão carioca cozido", "feijão carioca", "feijão cozido"],
+      "categories": ["legume", "carbohydrate_source", "protein_source"],
+      "tags": {
+        "vegan": "true",
+        "vegetarian": "true",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "057",
+      "name": "Feijão, preto, cozido",
+      "scientific_name": "Phaseolus vulgaris L.",
+      "food_group": "Leguminosas e derivados",
+      "preparation_state": "cooked",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 77,
+        "energy_kj": 322,
+        "protein_g": 4.5,
+        "fat_g": 0.5,
+        "carbohydrate_g": 14.0,
+        "fiber_g": 8.4,
+        "sodium_mg": 2,
+        "calcium_mg": 29,
+        "iron_mg": 1.5,
+        "potassium_mg": 256,
+        "magnesium_mg": 40,
+        "zinc_mg": 0.7,
+        "vitamin_c_mg": "Tr",
+        "cholesterol_mg": "NA"
+      },
+      "household_measures": [
+        { "label": "1 concha média", "grams": 140, "source": "TACO", "is_estimated": false },
+        { "label": "1 colher de sopa", "grams": 20, "source": "TACO", "is_estimated": false }
+      ],
+      "aliases": ["feijão preto cozido", "feijão preto"],
+      "categories": ["legume", "carbohydrate_source", "protein_source"],
+      "tags": {
+        "vegan": "true",
+        "vegetarian": "true",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "060",
+      "name": "Lentilha, cozida",
+      "scientific_name": "Lens culinaris Medik.",
+      "food_group": "Leguminosas e derivados",
+      "preparation_state": "cooked",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 93,
+        "energy_kj": 389,
+        "protein_g": 6.3,
+        "fat_g": 0.5,
+        "carbohydrate_g": 16.3,
+        "fiber_g": 7.9,
+        "sodium_mg": 2,
+        "calcium_mg": 16,
+        "iron_mg": 1.5,
+        "potassium_mg": 224,
+        "magnesium_mg": 22,
+        "zinc_mg": 0.8,
+        "vitamin_c_mg": "Tr",
+        "cholesterol_mg": "NA"
+      },
+      "household_measures": [
+        { "label": "1 concha média", "grams": 130, "source": "IBGE", "is_estimated": false },
+        { "label": "1 colher de sopa", "grams": 25, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["lentilha cozida", "lentilha"],
+      "categories": ["legume", "carbohydrate_source", "protein_source"],
+      "tags": {
+        "vegan": "true",
+        "vegetarian": "true",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "070",
+      "name": "Frango, peito, sem pele, cru",
+      "scientific_name": "Gallus gallus",
+      "food_group": "Carnes e derivados",
+      "preparation_state": "raw",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 119,
+        "energy_kj": 497,
+        "protein_g": 21.5,
+        "fat_g": 3.0,
+        "carbohydrate_g": 0.0,
+        "fiber_g": 0.0,
+        "sodium_mg": 50,
+        "calcium_mg": 9,
+        "iron_mg": 0.4,
+        "potassium_mg": 368,
+        "magnesium_mg": 28,
+        "zinc_mg": 0.8,
+        "vitamin_c_mg": "NA",
+        "cholesterol_mg": 58
+      },
+      "household_measures": [
+        { "label": "1 filé médio cru", "grams": 120, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["peito de frango cru", "frango cru", "filé de frango cru"],
+      "categories": ["protein_source"],
+      "tags": {
+        "vegan": "false",
+        "vegetarian": "false",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "071",
+      "name": "Frango, peito, sem pele, grelhado",
+      "scientific_name": "Gallus gallus",
+      "food_group": "Carnes e derivados",
+      "preparation_state": "grilled",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 159,
+        "energy_kj": 667,
+        "protein_g": 32.0,
+        "fat_g": 2.5,
+        "carbohydrate_g": 0.0,
+        "fiber_g": 0.0,
+        "sodium_mg": 55,
+        "calcium_mg": 10,
+        "iron_mg": 0.5,
+        "potassium_mg": 410,
+        "magnesium_mg": 35,
+        "zinc_mg": 1.1,
+        "vitamin_c_mg": "NA",
+        "cholesterol_mg": 89
+      },
+      "household_measures": [
+        { "label": "1 filé médio grelhado", "grams": 100, "source": "TACO", "is_estimated": false },
+        { "label": "1 filé pequeno", "grams": 70, "source": "IBGE", "is_estimated": false },
+        { "label": "1 filé grande", "grams": 150, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["peito de frango grelhado", "frango grelhado", "filé de frango grelhado"],
+      "categories": ["protein_source"],
+      "tags": {
+        "vegan": "false",
+        "vegetarian": "false",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "083",
+      "name": "Bovino, patinho, sem gordura, cru",
+      "scientific_name": "Bos taurus",
+      "food_group": "Carnes e derivados",
+      "preparation_state": "raw",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 133,
+        "energy_kj": 559,
+        "protein_g": 21.7,
+        "fat_g": 4.5,
+        "carbohydrate_g": 0.0,
+        "fiber_g": 0.0,
+        "sodium_mg": 57,
+        "calcium_mg": 4,
+        "iron_mg": 2.0,
+        "potassium_mg": 344,
+        "magnesium_mg": 24,
+        "zinc_mg": 4.4,
+        "vitamin_c_mg": "NA",
+        "cholesterol_mg": 60
+      },
+      "household_measures": [
+        { "label": "1 bife médio cru", "grams": 120, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["patinho cru", "carne moída crua", "bife de patinho cru"],
+      "categories": ["protein_source"],
+      "tags": {
+        "vegan": "false",
+        "vegetarian": "false",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "084",
+      "name": "Bovino, patinho, sem gordura, grelhado",
+      "scientific_name": "Bos taurus",
+      "food_group": "Carnes e derivados",
+      "preparation_state": "grilled",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 219,
+        "energy_kj": 918,
+        "protein_g": 35.9,
+        "fat_g": 7.3,
+        "carbohydrate_g": 0.0,
+        "fiber_g": 0.0,
+        "sodium_mg": 65,
+        "calcium_mg": 5,
+        "iron_mg": 3.0,
+        "potassium_mg": 444,
+        "magnesium_mg": 30,
+        "zinc_mg": 6.8,
+        "vitamin_c_mg": "NA",
+        "cholesterol_mg": 126
+      },
+      "household_measures": [
+        { "label": "1 bife médio grelhado", "grams": 90, "source": "TACO", "is_estimated": false },
+        { "label": "1 colher de sopa de carne moída", "grams": 25, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["patinho grelhado", "bife de patinho", "carne moída refogada"],
+      "categories": ["protein_source"],
+      "tags": {
+        "vegan": "false",
+        "vegetarian": "false",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "105",
+      "name": "Peixe, tilápia, filé, cru",
+      "scientific_name": "Oreochromis niloticus",
+      "food_group": "Pescados e frutos do mar",
+      "preparation_state": "raw",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 96,
+        "energy_kj": 402,
+        "protein_g": 19.3,
+        "fat_g": 1.7,
+        "carbohydrate_g": 0.0,
+        "fiber_g": 0.0,
+        "sodium_mg": 52,
+        "calcium_mg": 9,
+        "iron_mg": 0.3,
+        "potassium_mg": 302,
+        "magnesium_mg": 27,
+        "zinc_mg": 0.4,
+        "vitamin_c_mg": "NA",
+        "cholesterol_mg": 50
+      },
+      "household_measures": [
+        { "label": "1 filé médio cru", "grams": 120, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["tilápia crua", "filé de tilápia", "peixe tilápia"],
+      "categories": ["protein_source"],
+      "tags": {
+        "vegan": "false",
+        "vegetarian": "false",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "true",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "106",
+      "name": "Peixe, tilápia, filé, grelhado",
+      "scientific_name": "Oreochromis niloticus",
+      "food_group": "Pescados e frutos do mar",
+      "preparation_state": "grilled",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 128,
+        "energy_kj": 536,
+        "protein_g": 26.1,
+        "fat_g": 2.7,
+        "carbohydrate_g": 0.0,
+        "fiber_g": 0.0,
+        "sodium_mg": 60,
+        "calcium_mg": 12,
+        "iron_mg": 0.4,
+        "potassium_mg": 380,
+        "magnesium_mg": 34,
+        "zinc_mg": 0.6,
+        "vitamin_c_mg": "NA",
+        "cholesterol_mg": 71
+      },
+      "household_measures": [
+        { "label": "1 filé médio grelhado", "grams": 100, "source": "TACO", "is_estimated": false }
+      ],
+      "aliases": ["tilápia grelhada", "filé de tilápia grelhado"],
+      "categories": ["protein_source"],
+      "tags": {
+        "vegan": "false",
+        "vegetarian": "false",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "true",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "118",
+      "name": "Ovo, de galinha, inteiro, cru",
+      "scientific_name": "Gallus gallus",
+      "food_group": "Ovos e derivados",
+      "preparation_state": "raw",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 143,
+        "energy_kj": 599,
+        "protein_g": 13.0,
+        "fat_g": 8.9,
+        "carbohydrate_g": 1.6,
+        "fiber_g": 0.0,
+        "sodium_mg": 168,
+        "calcium_mg": 42,
+        "iron_mg": 1.6,
+        "potassium_mg": 150,
+        "magnesium_mg": 13,
+        "zinc_mg": 1.1,
+        "vitamin_c_mg": "NA",
+        "cholesterol_mg": 356
+      },
+      "household_measures": [
+        { "label": "1 unidade média crua", "grams": 50, "source": "TACO", "is_estimated": false }
+      ],
+      "aliases": ["ovo cru", "ovo de galinha cru"],
+      "categories": ["protein_source", "fat_source"],
+      "tags": {
+        "vegan": "false",
+        "vegetarian": "true",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "true",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "119",
+      "name": "Ovo, de galinha, inteiro, cozido",
+      "scientific_name": "Gallus gallus",
+      "food_group": "Ovos e derivados",
+      "preparation_state": "cooked",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 146,
+        "energy_kj": 610,
+        "protein_g": 13.3,
+        "fat_g": 9.5,
+        "carbohydrate_g": 0.6,
+        "fiber_g": 0.0,
+        "sodium_mg": 146,
+        "calcium_mg": 49,
+        "iron_mg": 1.5,
+        "potassium_mg": 147,
+        "magnesium_mg": 12,
+        "zinc_mg": 1.2,
+        "vitamin_c_mg": "NA",
+        "cholesterol_mg": 397
+      },
+      "household_measures": [
+        { "label": "1 unidade média cozida", "grams": 50, "source": "TACO", "is_estimated": false },
+        { "label": "1 unidade grande cozida", "grams": 60, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["ovo cozido", "ovo de galinha cozido"],
+      "categories": ["protein_source", "fat_source"],
+      "tags": {
+        "vegan": "false",
+        "vegetarian": "true",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "true",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "130",
+      "name": "Leite, de vaca, integral",
+      "food_group": "Leite e derivados",
+      "preparation_state": "industrialized",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 60,
+        "energy_kj": 252,
+        "protein_g": 3.0,
+        "fat_g": 3.2,
+        "carbohydrate_g": 4.8,
+        "fiber_g": 0.0,
+        "sodium_mg": 52,
+        "calcium_mg": 123,
+        "iron_mg": "Tr",
+        "potassium_mg": 140,
+        "magnesium_mg": 10,
+        "zinc_mg": 0.4,
+        "vitamin_c_mg": 1.0,
+        "cholesterol_mg": 14
+      },
+      "household_measures": [
+        { "label": "1 copo americano", "grams": 200, "source": "TACO", "is_estimated": false },
+        { "label": "1 xícara de chá", "grams": 160, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["leite integral", "leite de vaca", "leite"],
+      "categories": ["dairy", "beverage"],
+      "tags": {
+        "vegan": "false",
+        "vegetarian": "true",
+        "contains_gluten": "false",
+        "contains_milk": "true",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "131",
+      "name": "Leite, de vaca, desnatado",
+      "food_group": "Leite e derivados",
+      "preparation_state": "industrialized",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 35,
+        "energy_kj": 146,
+        "protein_g": 3.0,
+        "fat_g": 0.2,
+        "carbohydrate_g": 4.9,
+        "fiber_g": 0.0,
+        "sodium_mg": 54,
+        "calcium_mg": 134,
+        "iron_mg": "Tr",
+        "potassium_mg": 150,
+        "magnesium_mg": 11,
+        "zinc_mg": 0.4,
+        "vitamin_c_mg": 1.0,
+        "cholesterol_mg": 2
+      },
+      "household_measures": [
+        { "label": "1 copo americano", "grams": 200, "source": "TACO", "is_estimated": false }
+      ],
+      "aliases": ["leite desnatado", "leite magro"],
+      "categories": ["dairy", "beverage"],
+      "tags": {
+        "vegan": "false",
+        "vegetarian": "true",
+        "contains_gluten": "false",
+        "contains_milk": "true",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "136",
+      "name": "Queijo, minas, frescal",
+      "food_group": "Leite e derivados",
+      "preparation_state": "industrialized",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 264,
+        "energy_kj": 1104,
+        "protein_g": 17.4,
+        "fat_g": 20.2,
+        "carbohydrate_g": 3.2,
+        "fiber_g": 0.0,
+        "sodium_mg": 310,
+        "calcium_mg": 579,
+        "iron_mg": 0.2,
+        "potassium_mg": 105,
+        "magnesium_mg": 21,
+        "zinc_mg": 2.5,
+        "vitamin_c_mg": "NA",
+        "cholesterol_mg": 62
+      },
+      "household_measures": [
+        { "label": "1 fatia média", "grams": 30, "source": "TACO", "is_estimated": false },
+        { "label": "1 fatia grossa", "grams": 50, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["queijo minas", "queijo frescal", "queijo branco"],
+      "categories": ["dairy", "protein_source", "fat_source"],
+      "tags": {
+        "vegan": "false",
+        "vegetarian": "true",
+        "contains_gluten": "false",
+        "contains_milk": "true",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "160",
+      "name": "Banana, prata, crua",
+      "scientific_name": "Musa paradisiaca L.",
+      "food_group": "Frutas e derivados",
+      "preparation_state": "raw",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 98,
+        "energy_kj": 411,
+        "protein_g": 1.3,
+        "fat_g": 0.1,
+        "carbohydrate_g": 26.0,
+        "fiber_g": 2.0,
+        "sodium_mg": "Tr",
+        "calcium_mg": 8,
+        "iron_mg": 0.4,
+        "potassium_mg": 358,
+        "magnesium_mg": 26,
+        "zinc_mg": 0.2,
+        "vitamin_c_mg": 21.6,
+        "cholesterol_mg": "NA"
+      },
+      "household_measures": [
+        { "label": "1 unidade média descascada", "grams": 85, "source": "TACO", "is_estimated": false },
+        { "label": "1 unidade pequena descascada", "grams": 65, "source": "IBGE", "is_estimated": false },
+        { "label": "1 unidade grande descascada", "grams": 110, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["banana prata", "banana"],
+      "categories": ["fruit", "carbohydrate_source"],
+      "tags": {
+        "vegan": "true",
+        "vegetarian": "true",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "175",
+      "name": "Maçã, fuji, com casca, crua",
+      "scientific_name": "Malus domestica Borkh.",
+      "food_group": "Frutas e derivados",
+      "preparation_state": "raw",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 56,
+        "energy_kj": 234,
+        "protein_g": 0.3,
+        "fat_g": 0.2,
+        "carbohydrate_g": 15.2,
+        "fiber_g": 1.3,
+        "sodium_mg": "Tr",
+        "calcium_mg": 4,
+        "iron_mg": 0.1,
+        "potassium_mg": 75,
+        "magnesium_mg": 5,
+        "zinc_mg": "Tr",
+        "vitamin_c_mg": 2.1,
+        "cholesterol_mg": "NA"
+      },
+      "household_measures": [
+        { "label": "1 unidade média", "grams": 130, "source": "TACO", "is_estimated": false },
+        { "label": "1 unidade pequena", "grams": 90, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["maçã fuji", "maçã com casca", "maçã"],
+      "categories": ["fruit", "carbohydrate_source"],
+      "tags": {
+        "vegan": "true",
+        "vegetarian": "true",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "205",
+      "name": "Alface, crespa, crua",
+      "scientific_name": "Lactuca sativa L.",
+      "food_group": "Verduras, hortaliças e derivados",
+      "preparation_state": "raw",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 11,
+        "energy_kj": 45,
+        "protein_g": 1.3,
+        "fat_g": 0.2,
+        "carbohydrate_g": 1.7,
+        "fiber_g": 1.8,
+        "sodium_mg": 4,
+        "calcium_mg": 38,
+        "iron_mg": 0.4,
+        "potassium_mg": 267,
+        "magnesium_mg": 11,
+        "zinc_mg": 0.3,
+        "vitamin_c_mg": 15.6,
+        "cholesterol_mg": "NA"
+      },
+      "household_measures": [
+        { "label": "1 folha média", "grams": 10, "source": "TACO", "is_estimated": false },
+        { "label": "1 prato de sobremesa picado", "grams": 50, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["alface crespa", "alface"],
+      "categories": ["vegetable"],
+      "tags": {
+        "vegan": "true",
+        "vegetarian": "true",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "215",
+      "name": "Brócolis, cozido",
+      "scientific_name": "Brassica oleracea L. var. italica",
+      "food_group": "Verduras, hortaliças e derivados",
+      "preparation_state": "cooked",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 25,
+        "energy_kj": 103,
+        "protein_g": 2.1,
+        "fat_g": 0.5,
+        "carbohydrate_g": 4.4,
+        "fiber_g": 3.4,
+        "sodium_mg": 12,
+        "calcium_mg": 51,
+        "iron_mg": 0.6,
+        "potassium_mg": 119,
+        "magnesium_mg": 15,
+        "zinc_mg": 0.3,
+        "vitamin_c_mg": 42.0,
+        "cholesterol_mg": "NA"
+      },
+      "household_measures": [
+        { "label": "1 ramo médio cozido", "grams": 35, "source": "TACO", "is_estimated": false },
+        { "label": "1 xícara de chá picado", "grams": 120, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["brócolis cozido", "brócolis"],
+      "categories": ["vegetable"],
+      "tags": {
+        "vegan": "true",
+        "vegetarian": "true",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "220",
+      "name": "Cenoura, crua",
+      "scientific_name": "Daucus carota L.",
+      "food_group": "Verduras, hortaliças e derivados",
+      "preparation_state": "raw",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 34,
+        "energy_kj": 143,
+        "protein_g": 1.3,
+        "fat_g": 0.2,
+        "carbohydrate_g": 7.7,
+        "fiber_g": 3.2,
+        "sodium_mg": 3,
+        "calcium_mg": 23,
+        "iron_mg": 0.2,
+        "potassium_mg": 315,
+        "magnesium_mg": 11,
+        "zinc_mg": 0.2,
+        "vitamin_c_mg": 5.3,
+        "cholesterol_mg": "NA"
+      },
+      "household_measures": [
+        { "label": "1 unidade média crua", "grams": 100, "source": "TACO", "is_estimated": false },
+        { "label": "1 colher de sopa ralada", "grams": 15, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["cenoura crua", "cenoura"],
+      "categories": ["vegetable"],
+      "tags": {
+        "vegan": "true",
+        "vegetarian": "true",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "280",
+      "name": "Azeite, de oliva, extravirgem",
+      "food_group": "Óleos e gorduras",
+      "preparation_state": "industrialized",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 884,
+        "energy_kj": 3700,
+        "protein_g": 0.0,
+        "fat_g": 100.0,
+        "carbohydrate_g": 0.0,
+        "fiber_g": 0.0,
+        "sodium_mg": 0,
+        "calcium_mg": 1,
+        "iron_mg": "Tr",
+        "potassium_mg": 1,
+        "magnesium_mg": 0,
+        "zinc_mg": 0.0,
+        "vitamin_c_mg": "NA",
+        "cholesterol_mg": 0
+      },
+      "household_measures": [
+        { "label": "1 colher de sopa", "grams": 13, "source": "TACO", "is_estimated": false },
+        { "label": "1 colher de sobremesa", "grams": 8, "source": "IBGE", "is_estimated": false },
+        { "label": "1 colher de chá", "grams": 4, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["azeite de oliva", "azeite extravirgem", "azeite"],
+      "categories": ["fat_source", "condiment"],
+      "tags": {
+        "vegan": "true",
+        "vegetarian": "true",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    },
+    {
+      "source_food_code": "295",
+      "name": "Castanha-do-Brasil, crua",
+      "scientific_name": "Bertholletia excelsa Bonpl.",
+      "food_group": "Nozes e sementes",
+      "preparation_state": "raw",
+      "is_generic": true,
+      "nutrients": {
+        "energy_kcal": 643,
+        "energy_kj": 2690,
+        "protein_g": 14.5,
+        "fat_g": 63.5,
+        "carbohydrate_g": 15.1,
+        "fiber_g": 7.9,
+        "sodium_mg": 2,
+        "calcium_mg": 146,
+        "iron_mg": 2.3,
+        "potassium_mg": 600,
+        "magnesium_mg": 365,
+        "zinc_mg": 4.2,
+        "vitamin_c_mg": "Tr",
+        "cholesterol_mg": "NA"
+      },
+      "household_measures": [
+        { "label": "1 unidade média", "grams": 5, "source": "TACO", "is_estimated": false },
+        { "label": "1 colher de sopa picada", "grams": 15, "source": "IBGE", "is_estimated": false }
+      ],
+      "aliases": ["castanha do pará", "castanha do brasil", "castanha-do-pará"],
+      "categories": ["fat_source", "snack"],
+      "tags": {
+        "vegan": "true",
+        "vegetarian": "true",
+        "contains_gluten": "false",
+        "contains_milk": "false",
+        "contains_egg": "false",
+        "contains_peanut": "false",
+        "contains_tree_nuts": "true",
+        "contains_fish": "false",
+        "contains_shellfish": "false",
+        "contains_soy": "false"
+      }
+    }
+  ]
+}
