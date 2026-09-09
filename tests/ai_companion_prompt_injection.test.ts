@@ -46,14 +46,14 @@ describe('ETAPA 8: AI Companion — Prompt Injection & Adversarial Hardening', (
     async getPendingAction() {
       return null;
     },
-    async consumePendingAction() {},
+    async completePendingAction() {},
     async applyDietSubstitution() {
-      return { success: true, new_item_id: 'item-new' };
+      return { success: true, new_plan_id: 'plan-new' };
     },
   };
 
   it('deve neutralizar tentativas clássicas de jailbreak ("Ignore previous instructions")', async () => {
-    const mockProvider = new MockAIProvider(async (_messages) => {
+    const mockProvider = new MockAIProvider(async () => {
       // O modelo respeita o contexto do sistema e rejeita a instrução adversária
       return {
         content: 'Não posso ignorar minhas diretrizes de segurança nem simular papéis administrativos. Como posso te apoiar no seu plano?',

@@ -11,6 +11,7 @@ import {
   AIProviderResponse,
   AIToolCall,
 } from '@/types/ai-companion';
+import { RATE_LIMIT_CONFIG } from './rate-limiter';
 
 /**
  * MockAIProvider para testes automatizados determinísticos, CI/CD e simulação de falhas.
@@ -90,7 +91,7 @@ export class GeminiAIProvider implements AIProvider {
       throw new Error('GEMINI_API_KEY não configurada no ambiente do servidor.');
     }
 
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${this.modelName}:generateContent?key=${this.apiKey}`;
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${this.modelName}:generateContent`;
 
     // Mapeamento de mensagens para formato Gemini
     const contents = messages
@@ -128,13 +129,16 @@ export class GeminiAIProvider implements AIProvider {
 
     const res = await fetch(endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': this.apiKey,
+      },
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(RATE_LIMIT_CONFIG.AI_REQUEST_TIMEOUT_MS),
     });
 
     if (!res.ok) {
-      const errorText = await res.text();
-      throw new Error(`Gemini API error (${res.status}): ${errorText}`);
+      throw new Error(`Gemini API indisponível (status ${res.status}).`);
     }
 
     const data = await res.json();
@@ -179,8 +183,11 @@ export class GeminiAIProvider implements AIProvider {
  * Factory padrão para resolver o AIProvider configurado no ambiente.
  */
 export function getAIProvider(): AIProvider {
-  if (process.env.NODE_ENV === 'test' || !process.env.GEMINI_API_KEY) {
+  if (process.env.NODE_ENV === 'test') {
     return new MockAIProvider();
+  }
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error('GEMINI_API_KEY não configurada; provider simulado é proibido fora de testes.');
   }
   return new GeminiAIProvider();
 }

@@ -30,9 +30,13 @@ export interface ToolDataServices {
   getTodayWorkout(patientId: string): Promise<unknown>;
   getProgressSummary(patientId: string): Promise<unknown>;
   getDietConstraints(patientId: string): Promise<NutritionConstraints>;
-  getFoodItem(foodId: string): Promise<DietMealItemSnapshot | null>;
+  getFoodItem(
+    patientId: string,
+    mealId: string,
+    foodId: string
+  ): Promise<(DietMealItemSnapshot & { item_id: string; plan_id: string; meal_id: string }) | null>;
   getFoodCatalog(): Promise<ComposerCandidateFood[]>;
-  getWorkoutConstraints(patientId: string): Promise<WorkoutConstraints>;
+  getWorkoutConstraints(patientId: string): Promise<WorkoutConstraints | null>;
   recordFeedback(event: {
     patient_id: string;
     conversation_id: string;
@@ -51,21 +55,30 @@ export interface ToolDataServices {
     payload: Record<string, unknown>;
     expires_at: Date;
   }): Promise<void>;
-  getPendingAction(token: string): Promise<{
+  getPendingAction(token: string, patientId: string): Promise<{
     patient_id: string;
     action_type: string;
     payload: Record<string, unknown>;
     expires_at: Date;
     is_consumed: boolean;
+    error?: string;
   } | null>;
-  consumePendingAction(token: string): Promise<void>;
+  completePendingAction(
+    token: string,
+    patientId: string,
+    success: boolean,
+    output?: Record<string, unknown>,
+    errorMessage?: string
+  ): Promise<void>;
   applyDietSubstitution(params: {
     patient_id: string;
+    plan_id: string;
+    item_id: string;
     meal_id: string;
     current_food_id: string;
     replacement_food_id: string;
     suggested_grams: number;
-  }): Promise<{ success: boolean; new_item_id: string }>;
+  }): Promise<{ success: boolean; new_plan_id: string }>;
 }
 
 export interface ToolExecutionContext {
@@ -112,6 +125,10 @@ export const AI_COMPANION_TOOLS: AIProviderToolDefinition[] = [
     parameters: {
       type: 'object',
       properties: {
+        meal_id: {
+          type: 'string',
+          description: 'Identificador da refeição do plano ativo que contém o alimento.',
+        },
         food_id: {
           type: 'string',
           description: 'Identificador do alimento a ser substituído.',
@@ -121,7 +138,7 @@ export const AI_COMPANION_TOOLS: AIProviderToolDefinition[] = [
           description: 'Quantidade atual em gramas do alimento (opcional).',
         },
       },
-      required: ['food_id'],
+      required: ['meal_id', 'food_id'],
     },
   },
   {
@@ -284,7 +301,7 @@ export async function executeAITool(
 
       case 'getFoodSubstitutionOptions': {
         const parsed = GetFoodSubstitutionArgsSchema.parse(rawArguments);
-        const foodItem = await context.dataServices.getFoodItem(parsed.food_id);
+        const foodItem = await context.dataServices.getFoodItem(patientId, parsed.meal_id, parsed.food_id);
 
         if (!foodItem) {
           return {
@@ -352,6 +369,16 @@ export async function executeAITool(
         }
 
         const constraints = await context.dataServices.getWorkoutConstraints(patientId);
+        if (!constraints) {
+          return {
+            tool_name: 'getExerciseSubstitutionOptions',
+            is_authorized: false,
+            authorization_denial_reason: 'As restrições de treino do paciente não estão persistidas em formato verificável.',
+            requires_user_confirmation: false,
+            output: { options: [], message: 'A substituição de exercício requer revisão profissional no momento.' },
+            error: 'WORKOUT_CONSTRAINTS_UNAVAILABLE',
+          };
+        }
         const options = getExerciseSubstitutionOptions(original, constraints, CURATED_EXERCISE_CATALOG);
         const enrichedOptions = options.map((opt) => {
           const matched = CURATED_EXERCISE_CATALOG.find((c) => c.id === opt.exercise_id);
@@ -414,7 +441,11 @@ export async function executeAITool(
 
       case 'proposeFoodSubstitution': {
         const parsed = ProposeFoodSubstitutionArgsSchema.parse(rawArguments);
-        const foodItem = await context.dataServices.getFoodItem(parsed.current_food_id);
+        const foodItem = await context.dataServices.getFoodItem(
+          patientId,
+          parsed.meal_id,
+          parsed.current_food_id
+        );
 
         if (!foodItem) {
           return {
@@ -453,6 +484,8 @@ export async function executeAITool(
           token: confirmationToken,
           action_type: 'food_substitution',
           payload: {
+            plan_id: foodItem.plan_id,
+            item_id: foodItem.item_id,
             meal_id: parsed.meal_id,
             current_food_id: parsed.current_food_id,
             replacement_food_id: parsed.replacement_food_id,
@@ -487,7 +520,7 @@ export async function executeAITool(
 
       case 'applyAuthorizedFoodSubstitution': {
         const parsed = ApplyAuthorizedFoodSubstitutionArgsSchema.parse(rawArguments);
-        const action = await context.dataServices.getPendingAction(parsed.confirmation_token);
+        const action = await context.dataServices.getPendingAction(parsed.confirmation_token, patientId);
 
         if (!action) {
           return {
@@ -497,6 +530,17 @@ export async function executeAITool(
             requires_user_confirmation: false,
             output: null,
             error: 'INVALID_CONFIRMATION_TOKEN',
+          };
+        }
+
+        if (action.error) {
+          return {
+            tool_name: 'applyAuthorizedFoodSubstitution',
+            is_authorized: false,
+            authorization_denial_reason: 'A confirmação não pôde ser reivindicada com segurança.',
+            requires_user_confirmation: false,
+            output: null,
+            error: action.error,
           };
         }
 
@@ -535,21 +579,50 @@ export async function executeAITool(
         }
 
         const payload = action.payload as {
+          plan_id: string;
+          item_id: string;
           meal_id: string;
           current_food_id: string;
           replacement_food_id: string;
           suggested_grams: number;
         };
 
-        const result = await context.dataServices.applyDietSubstitution({
-          patient_id: patientId,
-          meal_id: payload.meal_id,
-          current_food_id: payload.current_food_id,
-          replacement_food_id: payload.replacement_food_id,
-          suggested_grams: payload.suggested_grams,
-        });
+        let result: { success: boolean; new_plan_id: string };
+        try {
+          result = await context.dataServices.applyDietSubstitution({
+            patient_id: patientId,
+            plan_id: payload.plan_id,
+            item_id: payload.item_id,
+            meal_id: payload.meal_id,
+            current_food_id: payload.current_food_id,
+            replacement_food_id: payload.replacement_food_id,
+            suggested_grams: payload.suggested_grams,
+          });
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : 'Falha desconhecida ao versionar o plano.';
+          await context.dataServices.completePendingAction(
+            parsed.confirmation_token,
+            patientId,
+            false,
+            undefined,
+            message
+          );
+          return {
+            tool_name: 'applyAuthorizedFoodSubstitution',
+            is_authorized: false,
+            authorization_denial_reason: 'A nova versão do plano não pôde ser criada.',
+            requires_user_confirmation: false,
+            output: null,
+            error: 'VERSIONED_SUBSTITUTION_FAILED',
+          };
+        }
 
-        await context.dataServices.consumePendingAction(parsed.confirmation_token);
+        await context.dataServices.completePendingAction(
+          parsed.confirmation_token,
+          patientId,
+          true,
+          { new_plan_id: result.new_plan_id }
+        );
 
         return {
           tool_name: 'applyAuthorizedFoodSubstitution',
@@ -557,7 +630,7 @@ export async function executeAITool(
           requires_user_confirmation: false,
           output: {
             success: true,
-            new_item_id: result.new_item_id,
+            new_plan_id: result.new_plan_id,
             message: 'Substituição realizada com sucesso no plano alimentar ativo.',
           },
         };

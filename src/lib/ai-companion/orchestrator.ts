@@ -132,8 +132,6 @@ export class AICompanionOrchestrator {
           });
         }
 
-        await this.deps.rateLimiter.recordMessage(patientId);
-
         return {
           success: true,
           content: safetyResult.safe_response_override,
@@ -288,8 +286,6 @@ export class AICompanionOrchestrator {
           safety_flags: safetyResult.flags,
         });
       }
-
-      await this.deps.rateLimiter.recordMessage(patientId);
 
       return {
         success: true,

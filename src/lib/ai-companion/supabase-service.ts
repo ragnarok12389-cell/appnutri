@@ -17,30 +17,50 @@ import { NutritionConstraints } from '@/types/nutrition-engine';
 import { ComposerCandidateFood } from '@/lib/diet-composer/types';
 import { WorkoutConstraints } from '@/types/workout-engine';
 import { ToolDataServices } from './tools';
+import { applySubstitutionAction } from '@/app/actions/diet-plan';
 
 export class SupabaseContextDataSource implements ContextDataSource {
   private supabase = createAdminClient();
 
   public async getProfile(patientId: string): Promise<ProfileContextPack> {
-    const { data: profile } = await this.supabase
+    const { data: profile, error: profileError } = await this.supabase
       .from('profiles')
       .select('full_name')
       .eq('id', patientId)
       .single();
 
-    const { data: nutProfile } = await this.supabase
+    if (profileError || !profile) {
+      throw new Error(`Perfil do paciente não localizado: ${profileError?.message ?? 'registro ausente'}`);
+    }
+
+    const { data: nutProfile, error: nutritionProfileError } = await this.supabase
       .from('patient_nutrition_profiles')
-      .select('objective, allergies, dietary_restrictions, physical_activity_level')
+      .select('primary_goal')
+      .eq('id', patientId)
+      .maybeSingle();
+
+    if (nutritionProfileError) {
+      throw new Error(`Falha ao carregar perfil nutricional: ${nutritionProfileError.message}`);
+    }
+
+    const { data: sensitive, error: sensitiveError } = await this.supabase
+      .from('patient_nutrition_sensitive')
+      .select('food_allergies, clinical_dietary_restrictions')
       .eq('patient_id', patientId)
-      .single();
+      .maybeSingle();
+
+    if (sensitiveError) {
+      throw new Error(`Falha ao carregar restrições clínicas: ${sensitiveError.message}`);
+    }
 
     return {
       patient_id: patientId,
-      full_name: profile?.full_name ?? 'Paciente',
-      objective: nutProfile?.objective ?? 'Manutenção da saúde e composição corporal',
-      allergies: nutProfile?.allergies ?? [],
-      dietary_restrictions: nutProfile?.dietary_restrictions ?? [],
+      full_name: profile.full_name ?? 'Paciente',
+      objective: nutProfile?.primary_goal ?? 'Manutenção da saúde e composição corporal',
+      allergies: sensitive?.food_allergies ?? [],
+      dietary_restrictions: sensitive?.clinical_dietary_restrictions ?? [],
       movement_contraindications: [],
+      movement_constraints_available: false,
     };
   }
 
@@ -223,23 +243,36 @@ export class SupabaseContextDataSource implements ContextDataSource {
     };
   }
 
-  public async getConversationHistory(conversationId?: string): Promise<ConversationContextPack> {
+  public async getConversationHistory(
+    patientId: string,
+    conversationId?: string
+  ): Promise<ConversationContextPack> {
     if (!conversationId) {
       return { recent_messages: [] };
     }
 
-    const { data: conv } = await this.supabase
+    const { data: conv, error: conversationError } = await this.supabase
       .from('ai_conversations')
       .select('context_summary')
       .eq('id', conversationId)
-      .single();
+      .eq('patient_id', patientId)
+      .maybeSingle();
 
-    const { data: msgs } = await this.supabase
+    if (conversationError || !conv) {
+      throw new Error('Conversa não pertence ao paciente autenticado.');
+    }
+
+    const { data: msgs, error: messagesError } = await this.supabase
       .from('ai_messages')
       .select('role, content')
       .eq('conversation_id', conversationId)
+      .eq('patient_id', patientId)
       .order('created_at', { ascending: true })
       .limit(10);
+
+    if (messagesError) {
+      throw new Error(`Falha ao carregar histórico da conversa: ${messagesError.message}`);
+    }
 
     return {
       recent_messages: (msgs ?? []).map((m) => ({
@@ -282,73 +315,69 @@ export class SupabaseToolDataServices implements ToolDataServices {
   }
 
   public async getDietConstraints(patientId: string): Promise<NutritionConstraints> {
-    const { data } = await this.supabase
-      .from('patient_nutrition_profiles')
-      .select('allergies, dietary_restrictions')
+    const { data, error } = await this.supabase
+      .from('nutrition_targets')
+      .select('constraints_data')
       .eq('patient_id', patientId)
-      .single();
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-    return {
-      allowed_dietary_pattern: null,
-      favorite_foods: [],
-      disliked_foods: [],
-      foods_patient_refuses: [],
-      preferred_protein_sources: [],
-      preferred_carbohydrate_sources: [],
-      preferred_fat_sources: [],
-      preferred_fruits: [],
-      preferred_vegetables: [],
-      cuisine_preferences: [],
-      religious_or_cultural_restrictions: [],
-      patient_reported_allergies: data?.allergies ?? [],
-      patient_reported_intolerances: [],
-      patient_reported_clinical_restrictions: data?.dietary_restrictions ?? [],
-      available_cooking_time_minutes: 30,
-      cooking_skill_level: 'medium',
-      meal_prep_days: ['sunday'],
-      available_equipment: {
-        has_refrigerator: true,
-        has_freezer: true,
-        has_microwave: true,
-        has_stove: true,
-        has_air_fryer: false,
-      },
-      logistics: {
-        needs_packed_meals: false,
-        eats_out_frequently: false,
-        meals_out_per_week: 0,
-        uses_delivery_frequency: null,
-        eats_at_work: false,
-        work_refrigerator_available: true,
-        work_microwave_available: true,
-      },
-      habits: {
-        water_intake_liters: 2.0,
-        coffee_frequency: 'daily',
-        alcohol_frequency: 'rarely',
-        hunger_pattern: 'normal',
-        primary_challenges: [],
-      },
-      budget_limit: {
-        daily_max: 50.0,
-        currency: 'BRL',
-        estimate_type: 'individual_exact',
-        flexibility: null,
-      },
-    };
+    if (error || !data?.constraints_data) {
+      throw new Error(`Restrições nutricionais versionadas não disponíveis: ${error?.message ?? 'snapshot ausente'}`);
+    }
+
+    return data.constraints_data as NutritionConstraints;
   }
 
-  public async getFoodItem(foodId: string): Promise<DietMealItemSnapshot | null> {
-    const { data: item } = await this.supabase
+  public async getFoodItem(
+    patientId: string,
+    mealId: string,
+    foodId: string
+  ): Promise<(DietMealItemSnapshot & { item_id: string; plan_id: string; meal_id: string }) | null> {
+    const { data: plan, error: planError } = await this.supabase
+      .from('diet_plans')
+      .select('id')
+      .eq('patient_id', patientId)
+      .eq('is_active', true)
+      .eq('approval_status', 'approved')
+      .maybeSingle();
+
+    if (planError) throw new Error(`Falha ao validar plano ativo: ${planError.message}`);
+    if (!plan) return null;
+
+    const { data: days, error: daysError } = await this.supabase
+      .from('diet_plan_days')
+      .select('id')
+      .eq('diet_plan_id', plan.id);
+    if (daysError) throw new Error(`Falha ao validar dias do plano: ${daysError.message}`);
+
+    const dayIds = (days ?? []).map((day) => day.id);
+    if (dayIds.length === 0) return null;
+
+    const { data: meal, error: mealError } = await this.supabase
+      .from('diet_meals')
+      .select('id')
+      .eq('id', mealId)
+      .in('diet_plan_day_id', dayIds)
+      .maybeSingle();
+    if (mealError) throw new Error(`Falha ao validar refeição do plano: ${mealError.message}`);
+    if (!meal) return null;
+
+    const { data: item, error: itemError } = await this.supabase
       .from('diet_meal_items')
       .select('*')
+      .eq('diet_meal_id', mealId)
       .eq('food_id', foodId)
-      .limit(1)
-      .single();
+      .maybeSingle();
 
+    if (itemError) throw new Error(`Falha ao validar item da refeição: ${itemError.message}`);
     if (!item) return null;
 
     return {
+      item_id: item.id,
+      plan_id: plan.id,
+      meal_id: meal.id,
       food_id: item.food_id,
       food_name: item.food_name,
       source_id: item.source_id,
@@ -374,40 +403,75 @@ export class SupabaseToolDataServices implements ToolDataServices {
   }
 
   public async getFoodCatalog(): Promise<ComposerCandidateFood[]> {
-    const { data } = await this.supabase
-      .from('food_items')
-      .select('*')
-      .limit(100);
+    const { data, error } = await this.supabase
+      .from('foods')
+      .select(`
+        id, source_food_code, name, normalized_name, food_group, source_type,
+        preparation_state, food_data_sources ( version ),
+        food_nutrients ( amount_per_100g, nutrients ( code ) ),
+        food_household_measures ( label, grams ),
+        food_tag_mappings ( value, food_tags ( code ) )
+      `)
+      .eq('is_active', true)
+      .eq('engine_eligibility_status', 'eligible_for_engine');
 
-    return (data ?? []).map((f) => ({
-      id: f.id,
-      name: f.name,
-      normalized_name: f.name.toLowerCase(),
-      source_food_code: f.source_food_code,
-      food_group: f.food_group,
-      source_type: f.source_type ?? 'taco',
-      source_version: f.source_version ?? '1.0.0',
-      preparation_state: f.preparation_state ?? 'cru',
-      role: 'other',
-      price_per_100g: null,
-      energy_kcal_100g: Number(f.energy_kcal),
-      protein_g_100g: Number(f.protein_g),
-      carbohydrate_g_100g: Number(f.carbohydrate_g),
-      fat_g_100g: Number(f.fat_g),
-      fiber_g_100g: f.fiber_g ? Number(f.fiber_g) : null,
-      sodium_mg_100g: f.sodium_mg ? Number(f.sodium_mg) : null,
-      tags: f.tags ?? {},
-    })) as ComposerCandidateFood[];
+    if (error || !data) {
+      throw new Error(`Catálogo canônico de alimentos indisponível: ${error?.message ?? 'sem dados'}`);
+    }
+
+    return (data as unknown as Array<{
+      id: string;
+      source_food_code: string;
+      name: string;
+      normalized_name: string;
+      food_group: string;
+      source_type: string;
+      preparation_state: string;
+      food_data_sources: { version: string } | null;
+      food_nutrients: Array<{ amount_per_100g: number | null; nutrients: { code: string } | null }>;
+      food_household_measures: Array<{ label: string; grams: number }>;
+      food_tag_mappings: Array<{ value: 'true' | 'false' | 'unknown'; food_tags: { code: string } | null }>;
+    }>).map((food) => {
+      const nutrients: Record<string, number> = {};
+      for (const entry of food.food_nutrients ?? []) {
+        if (entry.nutrients?.code && entry.amount_per_100g !== null) {
+          nutrients[entry.nutrients.code] = Number(entry.amount_per_100g);
+        }
+      }
+      const tags: Record<string, 'true' | 'false' | 'unknown'> = {};
+      for (const entry of food.food_tag_mappings ?? []) {
+        if (entry.food_tags?.code) tags[entry.food_tags.code] = entry.value;
+      }
+      const measure = food.food_household_measures?.[0];
+      return {
+        id: food.id,
+        name: food.name,
+        normalized_name: food.normalized_name,
+        source_food_code: food.source_food_code,
+        food_group: food.food_group,
+        source_type: food.source_type,
+        source_version: food.food_data_sources?.version ?? 'unknown',
+        preparation_state: food.preparation_state,
+        role: 'other',
+        price_per_100g: null,
+        price_confidence: 0,
+        price_source_level: 'unknown',
+        energy_kcal_100g: nutrients.energy_kcal ?? 0,
+        protein_g_100g: nutrients.protein ?? 0,
+        carbohydrate_g_100g: nutrients.carbohydrate ?? 0,
+        fat_g_100g: nutrients.lipids ?? 0,
+        fiber_g_100g: nutrients.dietary_fiber ?? null,
+        sodium_mg_100g: nutrients.sodium ?? null,
+        household_measure: measure ? { label: measure.label, grams: Number(measure.grams) } : null,
+        tags,
+      } satisfies ComposerCandidateFood;
+    });
   }
 
-  public async getWorkoutConstraints(_patientId: string): Promise<WorkoutConstraints> {
-    return {
-      available_equipment: ['barbell', 'dumbbell', 'machine', 'cable', 'bench', 'bodyweight'],
-      movement_contraindications: [],
-      favorite_exercises: [],
-      exercises_refused: [],
-      preferred_equipment: [],
-    };
+  public async getWorkoutConstraints(): Promise<WorkoutConstraints | null> {
+    // A Etapa 7 persiste somente o hash do input, não o snapshot das restrições.
+    // Sem evidência verificável, o Companion deve falhar fechado.
+    return null;
   }
 
   public async recordFeedback(event: {
@@ -451,7 +515,7 @@ export class SupabaseToolDataServices implements ToolDataServices {
     payload: Record<string, unknown>;
     expires_at: Date;
   }): Promise<void> {
-    await this.supabase.from('ai_tool_executions').insert({
+    const { error } = await this.supabase.from('ai_tool_executions').insert({
       patient_id: action.patient_id,
       conversation_id: action.conversation_id,
       tool_name: 'proposeFoodSubstitution',
@@ -464,65 +528,98 @@ export class SupabaseToolDataServices implements ToolDataServices {
       execution_status: 'pending_confirmation',
       output_payload: action.payload,
     });
+
+    if (error) {
+      throw new Error(`Falha ao criar confirmação pendente: ${error.message}`);
+    }
   }
 
-  public async getPendingAction(token: string): Promise<{
+  public async getPendingAction(token: string, patientId: string): Promise<{
     patient_id: string;
     action_type: string;
     payload: Record<string, unknown>;
     expires_at: Date;
     is_consumed: boolean;
+    error?: string;
   } | null> {
-    const { data } = await this.supabase
-      .from('ai_tool_executions')
-      .select('patient_id, input_arguments, confirmation_expires_at, confirmation_status')
-      .eq('confirmation_token', token)
-      .single();
+    const { data, error } = await this.supabase.rpc('claim_ai_pending_action', {
+      p_confirmation_token: token,
+      p_patient_id: patientId,
+    });
 
-    if (!data) return null;
+    if (error) {
+      throw new Error(`Falha ao reivindicar confirmação: ${error.message}`);
+    }
+
+    const result = data as {
+      ok?: boolean;
+      error?: string;
+      patient_id?: string;
+      payload?: Record<string, unknown>;
+      expires_at?: string;
+    } | null;
+
+    if (!result) return null;
+    if (!result.ok) {
+      return {
+        patient_id: patientId,
+        action_type: 'food_substitution',
+        payload: {},
+        expires_at: new Date(0),
+        is_consumed: true,
+        error: result.error ?? 'INVALID_CONFIRMATION_TOKEN',
+      };
+    }
 
     return {
-      patient_id: data.patient_id,
+      patient_id: result.patient_id ?? patientId,
       action_type: 'food_substitution',
-      payload: data.input_arguments as Record<string, unknown>,
-      expires_at: new Date(data.confirmation_expires_at),
-      is_consumed: data.confirmation_status === 'confirmed',
+      payload: result.payload ?? {},
+      expires_at: new Date(result.expires_at ?? Date.now() + 60_000),
+      is_consumed: false,
     };
   }
 
-  public async consumePendingAction(token: string): Promise<void> {
-    await this.supabase
-      .from('ai_tool_executions')
-      .update({
-        confirmation_status: 'confirmed',
-        execution_status: 'success',
-      })
-      .eq('confirmation_token', token);
+  public async completePendingAction(
+    token: string,
+    patientId: string,
+    success: boolean,
+    output?: Record<string, unknown>,
+    errorMessage?: string
+  ): Promise<void> {
+    const { data, error } = await this.supabase.rpc('finalize_ai_pending_action', {
+      p_confirmation_token: token,
+      p_patient_id: patientId,
+      p_success: success,
+      p_output: output ?? null,
+      p_error_message: errorMessage ?? null,
+    });
+
+    if (error || data !== true) {
+      throw new Error(`Falha ao finalizar confirmação: ${error?.message ?? 'ação não estava em processamento'}`);
+    }
   }
 
   public async applyDietSubstitution(params: {
     patient_id: string;
+    plan_id: string;
+    item_id: string;
     meal_id: string;
     current_food_id: string;
     replacement_food_id: string;
     suggested_grams: number;
-  }): Promise<{ success: boolean; new_item_id: string }> {
-    // Efetiva a substituição no item da refeição
-    const { data: updated, error } = await this.supabase
-      .from('diet_meal_items')
-      .update({
-        food_id: params.replacement_food_id,
-        serving_weight_g: params.suggested_grams,
-      })
-      .eq('diet_meal_id', params.meal_id)
-      .eq('food_id', params.current_food_id)
-      .select('id')
-      .single();
+  }): Promise<{ success: boolean; new_plan_id: string }> {
+    const result = await applySubstitutionAction(
+      params.plan_id,
+      params.item_id,
+      params.replacement_food_id,
+      params.suggested_grams
+    );
 
-    if (error || !updated) {
-      throw new Error(`Falha ao aplicar substituição no plano: ${error?.message}`);
+    if (!result.success || !result.data) {
+      throw new Error(result.error ?? 'Falha ao criar versão substituta do plano alimentar.');
     }
 
-    return { success: true, new_item_id: updated.id };
+    return { success: true, new_plan_id: result.data.newPlanId };
   }
 }

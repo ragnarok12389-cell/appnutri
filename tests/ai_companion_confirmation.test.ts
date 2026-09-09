@@ -8,7 +8,10 @@ describe('ETAPA 8: AI Companion — Confirmation Flow for Write Actions', () => 
   const PATIENT_B_ID = 'patient-beta-uuid';
   const MEAL_ID = '33333333-3333-4333-a333-333333333333';
 
-  const mockChickenItem: DietMealItemSnapshot = {
+  const mockChickenItem: DietMealItemSnapshot & { item_id: string; plan_id: string; meal_id: string } = {
+    item_id: '44444444-4444-4444-8444-444444444444',
+    plan_id: '55555555-5555-4555-8555-555555555555',
+    meal_id: MEAL_ID,
     food_id: 'food-003', // Frango peito
     food_name: 'Frango, peito, sem pele, grelhado',
     source_id: 'src-1',
@@ -51,7 +54,8 @@ describe('ETAPA 8: AI Companion — Confirmation Flow for Write Actions', () => 
       async getTodayWorkout() { return {}; },
       async getProgressSummary() { return {}; },
       async getDietConstraints() { return STANDARD_CONSTRAINTS; },
-      async getFoodItem(foodId) {
+      async getFoodItem(_patientId, mealId, foodId) {
+        if (mealId !== MEAL_ID) return null;
         if (foodId === 'food-003') return mockChickenItem;
         return null;
       },
@@ -78,12 +82,12 @@ describe('ETAPA 8: AI Companion — Confirmation Flow for Write Actions', () => 
       async getPendingAction(token) {
         return pendingActions.get(token) ?? null;
       },
-      async consumePendingAction(token) {
+      async completePendingAction(token, _patientId, success) {
         const item = pendingActions.get(token);
-        if (item) item.is_consumed = true;
+        if (item && success) item.is_consumed = true;
       },
-      async applyDietSubstitution(_params) {
-        return { success: true, new_item_id: 'item-substituted-123' };
+      async applyDietSubstitution() {
+        return { success: true, new_plan_id: 'plan-version-123' };
       },
     },
   });
@@ -135,9 +139,9 @@ describe('ETAPA 8: AI Companion — Confirmation Flow for Write Actions', () => 
     );
 
     expect(applyRes.is_authorized).toBe(true);
-    const applyOutput = applyRes.output as { success: boolean; new_item_id: string };
+    const applyOutput = applyRes.output as { success: boolean; new_plan_id: string };
     expect(applyOutput.success).toBe(true);
-    expect(applyOutput.new_item_id).toBe('item-substituted-123');
+    expect(applyOutput.new_plan_id).toBe('plan-version-123');
   });
 
   it('deve rejeitar reutilização de token já consumido com ACTION_ALREADY_CONSUMED', async () => {

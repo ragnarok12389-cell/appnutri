@@ -8,7 +8,10 @@ describe('ETAPA 8: AI Companion — Tool Registry & Deterministic Engine Integra
   const PATIENT_ID = 'test-patient-uuid';
   const CONVERSATION_ID = 'test-conv-uuid';
 
-  const mockChickenItem: DietMealItemSnapshot = {
+  const mockChickenItem: DietMealItemSnapshot & { item_id: string; plan_id: string; meal_id: string } = {
+    item_id: '44444444-4444-4444-8444-444444444444',
+    plan_id: '55555555-5555-4555-8555-555555555555',
+    meal_id: '33333333-3333-4333-a333-333333333333',
     food_id: 'food-003', // Frango peito grelhado
     food_name: 'Frango, peito, sem pele, grelhado',
     source_id: 'src-1',
@@ -54,7 +57,8 @@ describe('ETAPA 8: AI Companion — Tool Registry & Deterministic Engine Integra
       async getDietConstraints() {
         return STANDARD_CONSTRAINTS;
       },
-      async getFoodItem(foodId) {
+      async getFoodItem(_patientId, mealId, foodId) {
+        if (mealId !== mockChickenItem.meal_id) return null;
         if (foodId === 'food-003') return mockChickenItem;
         return null;
       },
@@ -66,16 +70,16 @@ describe('ETAPA 8: AI Companion — Tool Registry & Deterministic Engine Integra
           available_equipment: ['barbell', 'dumbbell', 'bench', 'machine'],
         });
       },
-      async recordFeedback(_ev) {
+      async recordFeedback() {
         return { id: 'feedback-123', status: 'recorded' };
       },
       async createPendingAction() {},
       async getPendingAction() {
         return null;
       },
-      async consumePendingAction() {},
+      async completePendingAction() {},
       async applyDietSubstitution() {
-        return { success: true, new_item_id: 'new-item' };
+        return { success: true, new_plan_id: 'new-plan' };
       },
       ...overrides,
     },
@@ -116,7 +120,11 @@ describe('ETAPA 8: AI Companion — Tool Registry & Deterministic Engine Integra
       },
     });
 
-    const res = await executeAITool('getFoodSubstitutionOptions', { food_id: 'food-003' }, ctx);
+    const res = await executeAITool(
+      'getFoodSubstitutionOptions',
+      { meal_id: mockChickenItem.meal_id, food_id: 'food-003' },
+      ctx
+    );
     expect(res.is_authorized).toBe(true);
     const output = res.output as { options: Array<{ food_id: string }> };
 
@@ -144,6 +152,23 @@ describe('ETAPA 8: AI Companion — Tool Registry & Deterministic Engine Integra
     expect(exerciseOutput.options.some((o) => o.code === 'DUMBBELL_BENCH_PRESS')).toBe(true);
     // Não pode sugerir Supino com Barra pois não tem barra
     expect(exerciseOutput.options.some((o) => o.required_equipment.includes('barbell'))).toBe(false);
+  });
+
+  it('deve falhar fechado quando restrições verificáveis de treino não estão disponíveis', async () => {
+    const ctx = createMockContext({
+      async getWorkoutConstraints() {
+        return null;
+      },
+    });
+
+    const result = await executeAITool(
+      'getExerciseSubstitutionOptions',
+      { exercise_id: 'BARBELL_BENCH_PRESS' },
+      ctx
+    );
+
+    expect(result.is_authorized).toBe(false);
+    expect(result.error).toBe('WORKOUT_CONSTRAINTS_UNAVAILABLE');
   });
 
   it('recordUserFeedback deve registrar feedback estruturado com sucesso', async () => {

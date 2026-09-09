@@ -80,6 +80,7 @@ describe('ETAPA 8: AI Companion — Segurança, RLS, Imutabilidade e Governança
       '20260908000015_deterministic_diet_plans.sql',
       '20260909000016_deterministic_workout_engine.sql',
       '20260909000017_ai_companion_and_orchestration.sql',
+      '20260909000018_ai_companion_runtime_hardening.sql',
     ];
 
     for (const file of migrationFiles) {
@@ -237,5 +238,19 @@ describe('ETAPA 8: AI Companion — Segurança, RLS, Imutabilidade e Governança
     });
 
     expect(res.rows.length).toBeGreaterThan(0);
+  });
+
+  it('Rate limit persistente deve permitir exatamente 20 consumos e bloquear o seguinte', async () => {
+    const decisions: boolean[] = [];
+    for (let index = 0; index < 21; index++) {
+      const result = await db.query<{ allowed: boolean }>(`
+        SELECT allowed
+        FROM public.consume_ai_rate_limit('${PATIENT_A_ID}', 20, 600)
+      `);
+      decisions.push(result.rows[0].allowed);
+    }
+
+    expect(decisions.filter(Boolean)).toHaveLength(20);
+    expect(decisions[20]).toBe(false);
   });
 });

@@ -120,7 +120,7 @@ describe('ETAPA 8: AI Companion — Context Builder & Tenant Isolation', () => {
     async getWorkoutProgram(patientId: string) {
       return mockDatabase[patientId]?.workout ?? { has_active_program: false };
     },
-    async getProgress(_patientId: string) {
+    async getProgress() {
       return { recent_sessions_completed: 3, last_logged_session_date: '2026-09-08' };
     },
     async getConversationHistory() {

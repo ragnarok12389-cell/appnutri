@@ -24,8 +24,8 @@ describe('ETAPA 8: AI Companion — Failure Modes, Rate Limiting & Fail-Closed',
     async recordFeedback() { return { id: '1', status: 'recorded' }; },
     async createPendingAction() {},
     async getPendingAction() { return null; },
-    async consumePendingAction() {},
-    async applyDietSubstitution() { return { success: true, new_item_id: '1' }; },
+    async completePendingAction() {},
+    async applyDietSubstitution() { return { success: true, new_plan_id: '1' }; },
   };
 
   it('Fail-Closed: Quando o provedor falha com erro de rede ou timeout, responde com mensagem segura', async () => {

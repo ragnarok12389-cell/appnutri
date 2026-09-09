@@ -5,7 +5,7 @@ import { ChatRequestSchema } from '@/types/ai-companion';
 import { getAIProvider } from '@/lib/ai-companion/provider';
 import { AICompanionOrchestrator } from '@/lib/ai-companion/orchestrator';
 import { SupabaseContextDataSource, SupabaseToolDataServices } from '@/lib/ai-companion/supabase-service';
-import { AIRateLimiter } from '@/lib/ai-companion/rate-limiter';
+import { AIRateLimiter, SupabaseRateLimitStore } from '@/lib/ai-companion/rate-limiter';
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,6 +31,19 @@ export async function POST(req: NextRequest) {
 
     const adminClient = createAdminClient();
     let conversationId = parsed.data.conversation_id;
+
+    if (conversationId) {
+      const { data: ownedConversation, error: conversationError } = await adminClient
+        .from('ai_conversations')
+        .select('id')
+        .eq('id', conversationId)
+        .eq('patient_id', user.id)
+        .maybeSingle();
+
+      if (conversationError || !ownedConversation) {
+        return NextResponse.json({ error: 'Conversa não encontrada para este paciente' }, { status: 404 });
+      }
+    }
 
     // Se não informou conversa, busca conversa ativa recente ou cria uma nova
     if (!conversationId) {
@@ -69,11 +82,11 @@ export async function POST(req: NextRequest) {
     const orchestrator = new AICompanionOrchestrator({
       provider: getAIProvider(),
       contextDataSource: new SupabaseContextDataSource(),
-      rateLimiter: new AIRateLimiter(),
+      rateLimiter: new AIRateLimiter(new SupabaseRateLimitStore(adminClient)),
       toolDataServices: new SupabaseToolDataServices(),
       messageStore: {
         async saveMessage(msg) {
-          const { data } = await adminClient
+          const { data, error } = await adminClient
             .from('ai_messages')
             .insert({
               conversation_id: msg.conversation_id,
@@ -86,15 +99,21 @@ export async function POST(req: NextRequest) {
             })
             .select('id')
             .single();
-          return data?.id ?? '';
+          if (error || !data) {
+            throw new Error(`Falha ao persistir mensagem do Companion: ${error?.message ?? 'registro ausente'}`);
+          }
+          return data.id;
         },
         async recordToolExecution(exec) {
-          const { data } = await adminClient
+          const { data, error } = await adminClient
             .from('ai_tool_executions')
             .insert(exec)
             .select('id')
             .single();
-          return data?.id ?? '';
+          if (error || !data) {
+            throw new Error(`Falha ao auditar ferramenta do Companion: ${error?.message ?? 'registro ausente'}`);
+          }
+          return data.id;
         },
       },
     });

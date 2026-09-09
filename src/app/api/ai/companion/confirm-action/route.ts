@@ -30,12 +30,29 @@ export async function POST(req: NextRequest) {
     const adminClient = createAdminClient();
     const { conversation_id, confirmation_token, decision } = parsed.data;
 
+    const { data: ownedConversation, error: conversationError } = await adminClient
+      .from('ai_conversations')
+      .select('id')
+      .eq('id', conversation_id)
+      .eq('patient_id', user.id)
+      .maybeSingle();
+
+    if (conversationError || !ownedConversation) {
+      return NextResponse.json({ error: 'Conversa não encontrada para este paciente' }, { status: 404 });
+    }
+
     if (decision === 'cancel') {
-      await adminClient
-        .from('ai_tool_executions')
-        .update({ confirmation_status: 'cancelled', execution_status: 'failed' })
-        .eq('confirmation_token', confirmation_token)
-        .eq('patient_id', user.id);
+      const { data: cancelled, error: cancelError } = await adminClient.rpc(
+        'cancel_ai_pending_action',
+        {
+          p_confirmation_token: confirmation_token,
+          p_patient_id: user.id,
+        }
+      );
+
+      if (cancelError || cancelled !== true) {
+        return NextResponse.json({ error: 'Ação pendente não encontrada ou já resolvida' }, { status: 400 });
+      }
 
       return NextResponse.json({
         success: true,

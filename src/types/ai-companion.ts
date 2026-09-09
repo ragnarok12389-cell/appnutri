@@ -63,6 +63,7 @@ export interface ProfileContextPack {
   dietary_restrictions: string[];
   allergies: string[];
   movement_contraindications: string[];
+  movement_constraints_available?: boolean;
 }
 
 export interface DietContextPack {
@@ -271,6 +272,7 @@ export type ConfirmActionRequest = z.infer<typeof ConfirmActionRequestSchema>;
 
 // Tool Argument Schemas
 export const GetFoodSubstitutionArgsSchema = z.object({
+  meal_id: z.string().uuid(),
   food_id: z.string().min(1),
   current_grams: z.number().positive().optional(),
 });

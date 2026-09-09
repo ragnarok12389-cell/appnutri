@@ -18,7 +18,7 @@ export interface ContextDataSource {
   getDietPlan(patientId: string): Promise<DietContextPack>;
   getWorkoutProgram(patientId: string): Promise<WorkoutContextPack>;
   getProgress(patientId: string): Promise<ProgressContextPack>;
-  getConversationHistory(conversationId?: string): Promise<ConversationContextPack>;
+  getConversationHistory(patientId: string, conversationId?: string): Promise<ConversationContextPack>;
 }
 
 /**
@@ -34,7 +34,7 @@ export class AIContextBuilder {
       this.dataSource.getDietPlan(patientId),
       this.dataSource.getWorkoutProgram(patientId),
       this.dataSource.getProgress(patientId),
-      this.dataSource.getConversationHistory(conversationId),
+      this.dataSource.getConversationHistory(patientId, conversationId),
     ]);
 
     return {
@@ -67,7 +67,7 @@ export class AIContextBuilder {
       `Objetivo: ${context.profile?.objective ?? 'Geral'}`,
       `Alergias Declaradas: ${(context.profile?.allergies ?? []).length > 0 ? context.profile.allergies.join(', ') : 'Nenhuma'}`,
       `Restrições Alimentares: ${(context.profile?.dietary_restrictions ?? []).length > 0 ? context.profile.dietary_restrictions.join(', ') : 'Nenhuma'}`,
-      `Contraindicações Biomecânicas: ${(context.profile?.movement_contraindications ?? []).length > 0 ? context.profile.movement_contraindications.join(', ') : 'Nenhuma'}`,
+      `Contraindicações Biomecânicas: ${context.profile?.movement_constraints_available === false ? 'dados não disponíveis; não presumir que o movimento é seguro' : (context.profile?.movement_contraindications ?? []).length > 0 ? context.profile.movement_contraindications.join(', ') : 'Nenhuma declarada'}`,
       '',
       '=== PLANO ALIMENTAR ATIVO ===',
     ];

@@ -24,6 +24,7 @@ describe('Supabase Migrations & Schema Architecture', () => {
     expect(files).toContain('20260908000015_deterministic_diet_plans.sql');
     expect(files).toContain('20260909000016_deterministic_workout_engine.sql');
     expect(files).toContain('20260909000017_ai_companion_and_orchestration.sql');
+    expect(files).toContain('20260909000018_ai_companion_runtime_hardening.sql');
   });
 
   it('should define all required domain tables in initial schema', () => {
@@ -321,6 +322,23 @@ describe('Supabase Migrations & Schema Architecture', () => {
     expect(mig17Sql).toContain("'ai.feedback.view'");
     expect(mig17Sql).toContain("'ai.admin'");
   });
-});
 
+  it('should harden AI runtime concurrency and keep privileged RPCs server-only in migration 18', () => {
+    const sql = fs.readFileSync(
+      path.join(migrationsDir, '20260909000018_ai_companion_runtime_hardening.sql'),
+      'utf-8'
+    );
+
+    expect(sql).toContain('FUNCTION public.consume_ai_rate_limit');
+    expect(sql).toContain('FUNCTION public.claim_ai_pending_action');
+    expect(sql).toContain('FUNCTION public.finalize_ai_pending_action');
+    expect(sql).toContain('FUNCTION public.cancel_ai_pending_action');
+    expect(sql).toContain('FOR UPDATE');
+    expect(sql).toContain('uq_ai_tool_confirmation_token');
+    expect(sql).toContain('dp.patient_id = p_patient_id');
+    expect(sql).toContain('dp.approval_status = \'approved\'');
+    expect(sql).toContain('REVOKE ALL ON FUNCTION public.claim_ai_pending_action');
+    expect(sql).toContain('TO service_role');
+  });
+});
 
