@@ -22,6 +22,12 @@ export default async function AdminPage() {
         </div>
         <div className="flex items-center space-x-2">
           <Link
+            href="/admin/products"
+            className="text-xs text-amber-400 hover:text-amber-300 border border-amber-500/30 bg-amber-950/30 px-3 py-1.5 rounded-lg transition-colors font-semibold"
+          >
+            Produtos e Acessos
+          </Link>
+          <Link
             href="/admin/foods"
             className="text-xs text-sky-400 hover:text-sky-300 border border-sky-500/30 bg-sky-950/30 px-3 py-1.5 rounded-lg transition-colors font-semibold"
           >

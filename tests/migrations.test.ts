@@ -359,4 +359,17 @@ describe('Supabase Migrations & Schema Architecture', () => {
     expect(sql).toContain('FROM PUBLIC, anon, authenticated');
     expect(sql).toContain('TO service_role');
   });
+
+  it('should define server-authoritative products and entitlements in migration 20', () => {
+    const sql = fs.readFileSync(path.join(migrationsDir, '20260909000020_products_and_entitlements.sql'), 'utf-8');
+    expect(sql).toContain('TABLE public.products');
+    expect(sql).toContain('TABLE public.product_features');
+    expect(sql).toContain('TABLE public.user_entitlements');
+    expect(sql).toContain('TABLE public.entitlement_events');
+    expect(sql).toContain('feature_snapshot');
+    expect(sql).toContain('FUNCTION public.has_my_entitlement');
+    expect(sql).toContain('FUNCTION public.grant_user_entitlement');
+    expect(sql).toContain('FUNCTION public.revoke_user_entitlement');
+    expect(sql).toContain('FROM PUBLIC, anon, authenticated');
+  });
 });
