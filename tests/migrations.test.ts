@@ -25,6 +25,9 @@ describe('Supabase Migrations & Schema Architecture', () => {
     expect(files).toContain('20260909000016_deterministic_workout_engine.sql');
     expect(files).toContain('20260909000017_ai_companion_and_orchestration.sql');
     expect(files).toContain('20260909000018_ai_companion_runtime_hardening.sql');
+    expect(files).toContain('20260909000019_progress_feedback_adjustments.sql');
+    expect(files).toContain('20260909000020_products_and_entitlements.sql');
+    expect(files).toContain('20260909000021_patient_media_and_meal_vision.sql');
   });
 
   it('should define all required domain tables in initial schema', () => {

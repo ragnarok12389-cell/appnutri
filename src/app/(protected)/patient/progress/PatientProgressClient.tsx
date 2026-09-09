@@ -1,14 +1,18 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { FormEvent, useState, useTransition } from 'react';
-import { Activity, AlertTriangle, ArrowLeft, Scale, ShieldCheck } from 'lucide-react';
+import { Activity, AlertTriangle, ArrowLeft, Camera, ImagePlus, Scale, ShieldCheck, Sparkles, Trash2 } from 'lucide-react';
 import { ProgressDashboardData, recordPatientCheckInAction } from '@/app/actions/progress';
+import { PatientMealPhoto, PatientProgressPhoto, ProgressPhotoCheckpoint } from '@/types/patient-media';
 
 interface Props {
   initialData: ProgressDashboardData;
   initialError?: string;
+  initialProgressPhotos: PatientProgressPhoto[];
+  initialMealPhotos: PatientMealPhoto[];
 }
 
 const ratingLabels = ['Muito baixo', 'Baixo', 'Regular', 'Bom', 'Muito bom'];
@@ -25,10 +29,62 @@ function RatingField({ label, name }: { label: string; name: string }) {
   );
 }
 
-export function PatientProgressClient({ initialData, initialError }: Props) {
+const checkpointLabels: Record<ProgressPhotoCheckpoint, string> = {
+  start: 'Estado inicial', midpoint: 'Meio do caminho', goal: 'Objetivo alcançado',
+};
+
+export function PatientProgressClient({ initialData, initialError, initialProgressPhotos, initialMealPhotos }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<string | null>(initialError ?? null);
+  const [mediaPending, setMediaPending] = useState(false);
+  const progressPhotos = initialProgressPhotos;
+  const mealPhotos = initialMealPhotos;
+
+  async function uploadProgressPhoto(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setMediaPending(true);
+    setMessage(null);
+    const response = await fetch('/api/progress/photos', { method: 'POST', body: new FormData(event.currentTarget) });
+    const result = await response.json();
+    setMediaPending(false);
+    if (!response.ok) return setMessage(result.error ?? 'Não foi possível enviar a foto.');
+    setMessage('Foto de evolução armazenada com privacidade.');
+    router.refresh();
+  }
+
+  async function deleteProgressPhoto(id: string) {
+    if (!window.confirm('Excluir esta foto da sua evolução?')) return;
+    setMediaPending(true);
+    const response = await fetch(`/api/progress/photos?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+    const result = await response.json();
+    setMediaPending(false);
+    if (!response.ok) return setMessage(result.error ?? 'Não foi possível excluir a foto.');
+    setMessage('Foto excluída.');
+    router.refresh();
+  }
+
+  async function deleteMealPhoto(id: string) {
+    if (!window.confirm('Excluir esta foto de refeição e a análise associada?')) return;
+    setMediaPending(true);
+    const response = await fetch(`/api/progress/meal-analysis?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+    const result = await response.json();
+    setMediaPending(false);
+    if (!response.ok) return setMessage(result.error ?? 'Não foi possível excluir a foto.');
+    setMessage('Foto de refeição e análise excluídas.');
+    router.refresh();
+  }
+
+  async function analyzeMealPhoto(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setMediaPending(true);
+    setMessage('Analisando a foto do prato…');
+    const response = await fetch('/api/progress/meal-analysis', { method: 'POST', body: new FormData(event.currentTarget) });
+    const result = await response.json();
+    setMediaPending(false);
+    setMessage(response.ok ? 'Análise concluída. Confira a estimativa abaixo.' : result.error ?? 'Não foi possível analisar a foto.');
+    router.refresh();
+  }
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -83,6 +139,36 @@ export function PatientProgressClient({ initialData, initialError }: Props) {
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5"><span className="text-xs text-zinc-500">Treinos realizados</span><div className="mt-1 text-2xl font-bold">{metrics?.workouts_completed ?? 0}</div></div>
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5"><span className="text-xs text-zinc-500">Variação de peso</span><div className="mt-1 text-2xl font-bold">{metrics?.weight_change_kg == null ? '—' : `${metrics.weight_change_kg > 0 ? '+' : ''}${metrics.weight_change_kg} kg`}</div></div>
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5"><span className="text-xs text-zinc-500">Qualidade dos dados</span><div className="mt-2 text-sm font-bold capitalize text-emerald-400">{initialData.latest_analysis?.data_quality ?? 'Aguardando dados'}</div></div>
+        </section>
+
+        <section className="grid gap-6 lg:grid-cols-2">
+          <div className="space-y-5 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
+            <div className="flex items-start gap-3"><Camera className="mt-0.5 h-5 w-5 text-emerald-400" /><div><h2 className="font-bold">Fotos da sua evolução</h2><p className="text-xs text-zinc-500">Registre início, meio e chegada. As imagens são privadas e só aparecem na sua conta.</p></div></div>
+            <form onSubmit={uploadProgressPhoto} className="grid gap-3 sm:grid-cols-2">
+              <select required name="checkpoint" className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white"><option value="start">Estado inicial</option><option value="midpoint">Meio do caminho</option><option value="goal">Objetivo alcançado</option></select>
+              <input required name="photo" type="file" accept="image/jpeg,image/png,image/webp" capture="user" className="rounded-lg border border-zinc-800 bg-zinc-950 p-2 text-xs text-zinc-300 file:mr-2 file:rounded file:border-0 file:bg-emerald-500 file:px-2 file:py-1 file:font-bold file:text-zinc-950" />
+              <input name="notes" maxLength={500} placeholder="Observação opcional" className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white sm:col-span-2" />
+              <button disabled={mediaPending} className="rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-bold text-zinc-950 disabled:opacity-50 sm:col-span-2"><ImagePlus className="mr-2 inline h-4 w-4" />Registrar foto</button>
+            </form>
+            <div className="grid grid-cols-3 gap-3">
+              {(['start', 'midpoint', 'goal'] as const).map((checkpoint) => {
+                const photo = progressPhotos.find((item) => item.checkpoint === checkpoint);
+                return <div key={checkpoint} className="space-y-2"><div className="relative aspect-[3/4] overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">{photo?.signed_url ? <Image src={photo.signed_url} alt={checkpointLabels[checkpoint]} fill unoptimized className="object-cover" /> : <div className="flex h-full items-center justify-center px-2 text-center text-xs text-zinc-600">Sem foto</div>}</div><div className="flex items-center justify-between gap-1"><span className="text-[11px] text-zinc-400">{checkpointLabels[checkpoint]}</span>{photo && <button type="button" onClick={() => deleteProgressPhoto(photo.id)} disabled={mediaPending} aria-label={`Excluir ${checkpointLabels[checkpoint]}`} className="text-zinc-600 hover:text-rose-400"><Trash2 className="h-3.5 w-3.5" /></button>}</div></div>;
+              })}
+            </div>
+          </div>
+
+          <div className="space-y-5 rounded-2xl border border-sky-500/20 bg-sky-500/5 p-6">
+            <div className="flex items-start gap-3"><Sparkles className="mt-0.5 h-5 w-5 text-sky-400" /><div><h2 className="font-bold">Análise do prato com IA</h2><p className="text-xs text-zinc-400">Fotografe a refeição para receber identificação e estimativas educativas.</p></div></div>
+            <form onSubmit={analyzeMealPhoto} className="space-y-3">
+              <input required name="photo" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" className="w-full rounded-lg border border-zinc-800 bg-zinc-950 p-2 text-xs text-zinc-300 file:mr-2 file:rounded file:border-0 file:bg-sky-500 file:px-2 file:py-1 file:font-bold file:text-zinc-950" />
+              <button disabled={mediaPending} className="w-full rounded-xl bg-sky-500 px-4 py-2.5 text-sm font-bold text-zinc-950 disabled:opacity-50"><Camera className="mr-2 inline h-4 w-4" />Fotografar e analisar</button>
+            </form>
+            <p className="text-[11px] leading-relaxed text-zinc-500">A foto permite apenas estimativas visuais. Porções, ingredientes ocultos e modo de preparo podem alterar bastante os valores. A IA não diagnostica nem muda seu plano.</p>
+            <div className="space-y-3">
+              {mealPhotos.length === 0 ? <p className="text-sm text-zinc-600">Sua primeira análise aparecerá aqui.</p> : mealPhotos.slice(0, 3).map((meal) => <div key={meal.id} className="flex gap-3 rounded-xl border border-zinc-800 bg-zinc-950/60 p-3"><div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-zinc-900">{meal.signed_url && <Image src={meal.signed_url} alt="Refeição analisada" fill unoptimized className="object-cover" />}</div><div className="min-w-0 flex-1 text-xs"><div className="flex items-center justify-between gap-2"><span className="font-bold text-zinc-300">{meal.status === 'completed' ? 'Análise concluída' : meal.status === 'pending' ? 'Analisando' : 'Análise indisponível'}</span><button type="button" onClick={() => deleteMealPhoto(meal.id)} disabled={mediaPending} aria-label="Excluir foto da refeição" className="text-zinc-600 hover:text-rose-400"><Trash2 className="h-3.5 w-3.5" /></button></div><p className="mt-1 line-clamp-3 text-zinc-500">{meal.analysis?.summary ?? 'Aguardando uma resposta válida do provedor de IA.'}</p>{meal.analysis?.estimated_calories && <p className="mt-1 text-sky-300">Estimativa: {meal.analysis.estimated_calories.min}–{meal.analysis.estimated_calories.max} kcal</p>}</div></div>)}
+            </div>
+          </div>
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
