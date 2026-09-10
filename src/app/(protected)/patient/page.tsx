@@ -99,12 +99,12 @@ export default async function PatientDashboardPage() {
   const workoutReviewRequired = latestActivation?.workout_status === 'review_required';
   const workoutNeedsConfiguration = latestActivation?.workout_status === 'needs_configuration';
   const needsHistoricalActivation = Boolean(nutritionProfile?.is_completed && !latestActivation);
-  const dietHref = latestDietPlan?.is_active || dietReviewRequired
-    ? '/patient/nutrition/plan'
-    : '/patient/nutrition-profile';
-  const workoutHref = latestWorkoutProgram?.is_active || workoutReviewRequired
-    ? '/patient/workout'
-    : '/patient/nutrition-profile';
+  const dietAvailable = Boolean(latestDietPlan?.is_active || latestActivation?.diet_status === 'generated');
+  const workoutAvailable = Boolean(latestWorkoutProgram?.is_active || latestActivation?.workout_status === 'generated');
+  // Depois que o perfil foi concluído, os atalhos sempre levam ao módulo.
+  // A edição do questionário continua disponível no card específico do perfil.
+  const dietHref = nutritionProfile?.is_completed ? '/patient/nutrition/plan' : '/patient/nutrition-profile';
+  const workoutHref = nutritionProfile?.is_completed ? '/patient/workout' : '/patient/nutrition-profile';
 
   const prof = link?.professional_profiles as unknown as {
     professional_type: string;
@@ -384,14 +384,14 @@ export default async function PatientDashboardPage() {
               <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-500">
                 <Apple className="w-5 h-5" />
               </div>
-              <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${latestDietPlan?.is_active ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : dietReviewRequired ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' : dietFailed ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' : 'bg-zinc-900 border-zinc-800 text-zinc-400'}`}>
-                {latestDietPlan?.is_active ? 'Disponível' : dietReviewRequired ? 'Em revisão' : dietFailed ? 'Requer atenção' : needsHistoricalActivation ? 'Gerar planos' : nutritionProfile?.is_completed ? 'Processando' : 'Bloqueado'}
+              <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${dietAvailable ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : dietReviewRequired ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' : dietFailed ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' : 'bg-zinc-900 border-zinc-800 text-zinc-400'}`}>
+                {dietAvailable ? 'Disponível' : dietReviewRequired ? 'Em revisão' : dietFailed ? 'Requer atenção' : needsHistoricalActivation ? 'Gerar planos' : nutritionProfile?.is_completed ? 'Processando' : 'Bloqueado'}
               </span>
             </div>
             <div>
               <h3 className="text-sm font-bold text-zinc-300">Minha Dieta</h3>
               <p className="text-[11px] text-zinc-500 mt-1 leading-relaxed">
-                {latestDietPlan?.is_active ? 'Veja suas refeições, porções, macros e substituições.' : dietReviewRequired ? 'Seu plano aguarda validação profissional antes da liberação.' : dietFailed ? 'Revise os dados do perfil ou procure o profissional responsável.' : needsHistoricalActivation ? 'Revise o perfil já preenchido e finalize para gerar dieta e treino.' : nutritionProfile?.is_completed ? 'Seu perfil foi concluído e o plano está sendo preparado.' : 'Conclua o perfil nutricional de 8 etapas para liberar este módulo.'}
+                {dietAvailable ? 'Veja suas refeições, porções, macros e substituições.' : dietReviewRequired ? 'Seu plano aguarda validação profissional antes da liberação.' : dietFailed ? 'Não foi possível preparar o plano. Abra o módulo para ver o estado atual.' : needsHistoricalActivation ? 'Seu perfil está completo; abra o módulo para preparar seu plano.' : nutritionProfile?.is_completed ? 'Seu perfil foi concluído e o plano está sendo preparado.' : 'Conclua o perfil nutricional de 8 etapas para liberar este módulo.'}
               </p>
             </div>
           </Link>
@@ -402,14 +402,14 @@ export default async function PatientDashboardPage() {
               <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-500">
                 <Dumbbell className="w-5 h-5" />
               </div>
-              <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${latestWorkoutProgram?.is_active ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : workoutReviewRequired ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' : workoutFailed ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' : 'bg-zinc-900 border-zinc-800 text-zinc-400'}`}>
-                {latestWorkoutProgram?.is_active ? 'Disponível' : workoutReviewRequired ? 'Em revisão' : workoutFailed ? 'Requer atenção' : workoutNeedsConfiguration ? 'Configurar' : needsHistoricalActivation ? 'Gerar planos' : nutritionProfile?.is_completed ? 'Processando' : 'Bloqueado'}
+              <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${workoutAvailable ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : workoutReviewRequired ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' : workoutFailed ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' : 'bg-zinc-900 border-zinc-800 text-zinc-400'}`}>
+                {workoutAvailable ? 'Disponível' : workoutReviewRequired ? 'Em revisão' : workoutFailed ? 'Requer atenção' : workoutNeedsConfiguration ? 'Configurar' : needsHistoricalActivation ? 'Gerar planos' : nutritionProfile?.is_completed ? 'Processando' : 'Bloqueado'}
               </span>
             </div>
             <div>
               <h3 className="text-sm font-bold text-zinc-300">Meu Treino</h3>
               <p className="text-[11px] text-zinc-500 mt-1 leading-relaxed">
-                {latestWorkoutProgram?.is_active ? 'Abra sua semana de treinos e registre séries e cargas.' : workoutReviewRequired ? 'O programa aguarda revisão antes da liberação.' : workoutFailed ? 'O programa não pôde ser gerado com os dados atuais.' : workoutNeedsConfiguration ? 'Informe ao menos dois dias semanais no perfil para gerar o treino.' : needsHistoricalActivation ? 'Revise o perfil já preenchido e finalize para gerar dieta e treino.' : nutritionProfile?.is_completed ? 'Seu programa está sendo preparado.' : 'Conclua o perfil nutricional de 8 etapas para liberar este módulo.'}
+                {workoutAvailable ? 'Abra sua semana de treinos e registre séries e cargas.' : workoutReviewRequired ? 'O programa aguarda revisão antes da liberação.' : workoutFailed ? 'Não foi possível preparar o treino. Abra o módulo para ver o estado atual.' : workoutNeedsConfiguration ? 'Informe ao menos dois dias semanais no perfil para gerar o treino.' : needsHistoricalActivation ? 'Seu perfil está completo; abra o módulo para preparar seu treino.' : nutritionProfile?.is_completed ? 'Seu programa está sendo preparado.' : 'Conclua o perfil nutricional de 8 etapas para liberar este módulo.'}
               </p>
             </div>
           </Link>

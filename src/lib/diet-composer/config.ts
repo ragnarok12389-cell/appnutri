@@ -2,8 +2,8 @@
 // CONFIG: DETERMINISTIC DIET COMPOSER VERSION, WEIGHTS & OPERATIONAL TOLERANCES
 // ==============================================================================
 
-export const DIET_COMPOSER_VERSION = '1.0.0';
-export const DIET_COMPOSER_CONFIG_VERSION = 'config-1.0.0';
+export const DIET_COMPOSER_VERSION = '1.0.1';
+export const DIET_COMPOSER_CONFIG_VERSION = 'config-1.0.1';
 
 /**
  * Threshold unificado e canônico de cobertura mínima de preços para verificação de orçamento (Etapa 6).
@@ -90,4 +90,3 @@ export const COMPOSER_THRESHOLDS = {
   MAX_DAYS_PER_PLAN: 7,
   MIN_DAYS_PER_PLAN: 1,
 } as const;
-

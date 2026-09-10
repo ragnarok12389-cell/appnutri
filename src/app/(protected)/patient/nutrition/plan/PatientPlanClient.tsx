@@ -99,7 +99,7 @@ export function PatientPlanClient({ initialPlan }: Props) {
             <h1 className="text-2xl font-bold text-gray-900">Meu Plano Alimentar</h1>
             {plan.approval_status === 'approved' ? (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Aprovado pela Nutricionista
+                <CheckCircle2 className="w-3.5 h-3.5" /> Plano liberado
               </span>
             ) : plan.generation_status === 'review_required' ? (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">

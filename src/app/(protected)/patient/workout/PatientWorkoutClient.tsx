@@ -133,9 +133,9 @@ export function PatientWorkoutClient({ initialProgram, patientId }: Props) {
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 px-4 border border-white/10 flex items-center gap-3">
             <TrendingUp className="w-8 h-8 text-emerald-400" />
             <div>
-              <div className="text-xs text-slate-300 font-medium">Status de Aprovação</div>
+              <div className="text-xs text-slate-300 font-medium">Status do programa</div>
               <div className="text-sm font-bold text-emerald-300 uppercase tracking-wide">
-                {program.approval_status}
+                {program.approval_status === 'approved' ? 'Liberado' : program.approval_status}
               </div>
             </div>
           </div>

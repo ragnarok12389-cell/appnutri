@@ -21,8 +21,12 @@ export function inferFoodRole(food: {
   fat_g_100g: number;
   categories?: string[];
 }): FoodRole {
-  const fg = (food.food_group || '').toLowerCase();
-  const cats = (food.categories || []).map((c) => c.toLowerCase());
+  const normalize = (value: string) => value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+  const fg = normalize(food.food_group || '');
+  const cats = (food.categories || []).map(normalize);
 
   if (cats.includes('protein_source') || cats.includes('meat') || cats.includes('poultry') || cats.includes('fish')) {
     return 'protein';
@@ -50,7 +54,7 @@ export function inferFoodRole(food: {
   if (fg.includes('carne') || fg.includes('pescado') || fg.includes('frango') || fg.includes('ovo')) {
     return 'protein';
   }
-  if (fg.includes('leite') || fg.includes('derivados') || fg.includes('queijo') || fg.includes('iogurte')) {
+  if (fg.includes('leite') || fg.includes('laticinio') || fg.includes('queijo') || fg.includes('iogurte')) {
     return 'dairy';
   }
   if (fg.includes('leguminosa')) {
@@ -171,7 +175,7 @@ export function filterEligibleFoods(
     }
 
     // Alimento 100% elegível e seguro
-    const role = food.role || inferFoodRole(food);
+    const role = !food.role || food.role === 'other' ? inferFoodRole(food) : food.role;
     eligibleFoods.push({
       ...food,
       role,

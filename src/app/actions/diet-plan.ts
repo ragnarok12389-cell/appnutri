@@ -21,6 +21,7 @@ import { PRICE_ENGINE_VERSION } from '@/lib/foods/pricing-config';
 import { DietMealItemSnapshot, DietMealType, DietPlan, FoodSubstitutionOption } from '@/types/diet-plan';
 import { NutritionConstraints } from '@/types/nutrition-engine';
 import { readCanonicalFoodNutrients } from '@/lib/diet-composer/catalog-mapping';
+import { inferOfficialAllergenEvidence } from '@/lib/foods/official-allergen-evidence';
 
 interface RawFoodNutrient {
   amount_per_100g: number | null;
@@ -254,6 +255,10 @@ export async function generateDietPlanAction(
         tagsMap[tagCode] = ft.value;
       }
     }
+    const effectiveTags = {
+      ...inferOfficialAllergenEvidence(f),
+      ...tagsMap,
+    };
 
     const hm = f.food_household_measures?.[0];
 
@@ -282,7 +287,7 @@ export async function generateDietPlanAction(
       preparation_state: f.preparation_state,
       ...nutrients,
       household_measure: hm ? { label: hm.label, grams: Number(hm.grams) } : null,
-      tags: tagsMap,
+      tags: effectiveTags,
       role: 'other', // inferido no filtro
       price_per_100g: pricePer100g,
       price_confidence: priceConfidence,
@@ -328,7 +333,7 @@ export async function generateDietPlanAction(
 
   // 10. Persistência Atômica no PostgreSQL via RPC em Transação Real (Lock de Concorrência e Superseding)
   const autoApprove = generatedPlan.approval_status === 'approved';
-  const { data: savedPlanId, error: rpcError } = await adminClient.rpc('persist_diet_plan_atomic', {
+  const { data: savedPlanId, error: rpcError } = await adminClient.rpc('persist_diet_plan_from_service', {
     p_plan: {
       ...generatedPlan,
       created_by: user.id,
@@ -957,7 +962,7 @@ export async function applySubstitutionAction(
   };
 
   // 6. Transação Atômica via RPC: insere nova versão e superseda a anterior
-  const { data: newPlanId, error: rpcError } = await adminClient.rpc('persist_diet_plan_atomic', {
+  const { data: newPlanId, error: rpcError } = await adminClient.rpc('persist_diet_plan_from_service', {
     p_plan: newPlan,
     p_auto_approve: autoApprove,
   });

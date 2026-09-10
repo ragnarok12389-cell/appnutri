@@ -18,6 +18,7 @@ import { runWorkoutComposer } from '@/lib/workout-engine/engine';
 import { CURATED_EXERCISE_CATALOG } from '@/lib/workout-engine/catalog';
 import { getExerciseSubstitutionOptions } from '@/lib/workout-engine/substitution';
 import { evaluateDoubleProgression } from '@/lib/workout-engine/progression';
+import { toPersistedExercise } from '@/lib/workout-engine/catalog-persistence';
 
 export interface ActionResponse<T = unknown> {
   data?: T;
@@ -72,14 +73,40 @@ export async function generateWorkoutProgramAction(
   }
 
   // 3. Catálogo de Exercícios (banco ou catálogo curado em memória)
-  const { data: dbCatalog } = await adminClient
+  const initialCatalogResult = await adminClient
     .from('exercise_catalog')
     .select('*')
     .eq('is_active', true);
+  let dbCatalog = initialCatalogResult.data;
+  const catalogError = initialCatalogResult.error;
 
-  const catalog: Exercise[] = (dbCatalog && dbCatalog.length > 0)
-    ? (dbCatalog as unknown as Exercise[])
-    : CURATED_EXERCISE_CATALOG;
+  if (catalogError) {
+    return { error: `Não foi possível carregar o catálogo de exercícios: ${catalogError.message}` };
+  }
+
+  const persistedCodes = new Set((dbCatalog || []).map((exercise) => exercise.code as string));
+  const missingExercises = CURATED_EXERCISE_CATALOG.filter((exercise) => !persistedCodes.has(exercise.code));
+
+  if (missingExercises.length > 0) {
+    const { error: seedError } = await adminClient
+      .from('exercise_catalog')
+      .upsert(missingExercises.map(toPersistedExercise), { onConflict: 'code' });
+
+    if (seedError) {
+      return { error: `Não foi possível sincronizar o catálogo de exercícios: ${seedError.message}` };
+    }
+
+    const refreshed = await adminClient
+      .from('exercise_catalog')
+      .select('*')
+      .eq('is_active', true);
+    if (refreshed.error) {
+      return { error: `Não foi possível recarregar o catálogo de exercícios: ${refreshed.error.message}` };
+    }
+    dbCatalog = refreshed.data;
+  }
+
+  const catalog: Exercise[] = dbCatalog as unknown as Exercise[];
 
   // 4. Montar Constraints
   const defaultConstraints: WorkoutConstraints = {
@@ -124,7 +151,7 @@ export async function generateWorkoutProgramAction(
 
   // 7. Persistência Atômica no PostgreSQL via RPC (Lock de Concorrência e Superseding)
   const autoApprove = generatedProgram.approval_status === 'approved';
-  const { data: savedProgramId, error: rpcError } = await adminClient.rpc('persist_workout_program_atomic', {
+  const { data: savedProgramId, error: rpcError } = await adminClient.rpc('persist_workout_program_from_service', {
     p_program: {
       ...generatedProgram,
       created_by: user.id,

@@ -183,7 +183,35 @@ function scoreCandidateForMeal(
     }
   }
 
-  // 2.2 Penalidade Suave de Alimentos Desgostados (-40) (soft preference)
+  // 2.2 Adequação nutricional ao papel do slot. O catálogo TACO contém
+  // centenas de itens por grupo; sem este critério, o desempate alfabético
+  // podia escolher cortes gordurosos para proteína e fontes pouco densas
+  // para carboidrato, tornando uma meta viável matematicamente inalcançável.
+  if (slotRole === 'protein') {
+    score += Math.min(80, food.protein_g_100g * 2);
+    const fatProteinRatio = food.protein_g_100g > 0
+      ? food.fat_g_100g / food.protein_g_100g
+      : 2;
+    const mealFatProteinRatio = mealTargets && mealTargets.protein_g > 0
+      ? mealTargets.fat_g / mealTargets.protein_g
+      : 0.4;
+    // Reserva parte da gordura para o slot lipídico e evita tanto cortes
+    // excessivamente gordurosos quanto proteínas secas demais para a meta.
+    const preferredRatio = Math.max(0.12, Math.min(0.3, mealFatProteinRatio * 0.5));
+    score -= Math.min(80, Math.abs(fatProteinRatio - preferredRatio) * 180);
+    if ((food.sodium_mg_100g ?? 0) > 800) score -= 25;
+  } else if (slotRole === 'carb') {
+    score += Math.min(80, food.carbohydrate_g_100g * 1.5);
+    score -= Math.min(50, food.fat_g_100g * 2);
+  } else if (slotRole === 'legume') {
+    score += Math.min(50, food.protein_g_100g + food.carbohydrate_g_100g);
+    score -= Math.min(60, food.fat_g_100g * 3);
+  } else if (slotRole === 'lipid') {
+    score += Math.min(160, food.fat_g_100g * 1.6);
+    score -= Math.min(50, food.carbohydrate_g_100g * 2);
+  }
+
+  // 2.3 Penalidade Suave de Alimentos Desgostados (-40) (soft preference)
   if ((constraints.disliked_foods || []).some((d) => normName.includes(d.toLowerCase()))) {
     score -= 40;
   }
