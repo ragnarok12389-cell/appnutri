@@ -218,7 +218,7 @@ export function PatientPlanClient({ initialPlan }: Props) {
         <div className="space-y-6">
           {currentDay.meals.map((meal) => (
             <div key={meal.meal_order} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="bg-gray-50/80 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+              <div className="bg-gray-50/80 px-4 sm:px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div>
                   <h3 className="font-semibold text-gray-900">{meal.meal_name}</h3>
                   <span className="text-xs text-gray-500">
@@ -232,7 +232,7 @@ export function PatientPlanClient({ initialPlan }: Props) {
 
               <div className="divide-y divide-gray-100">
                 {meal.items.map((item) => (
-                  <div key={item.item_order} className="p-4 sm:px-6 flex items-center justify-between gap-4 hover:bg-gray-50/50 transition-colors">
+                  <div key={item.item_order} className="p-4 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 hover:bg-gray-50/50 transition-colors">
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-gray-900">{item.food_name}</span>
@@ -256,7 +256,7 @@ export function PatientPlanClient({ initialPlan }: Props) {
 
                     <button
                       onClick={() => handleOpenSubstitution(item)}
-                      className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100/70 px-3 py-1.5 rounded-lg transition-colors"
+                      className="self-start sm:self-auto inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100/70 px-3 py-1.5 rounded-lg transition-colors"
                     >
                       <RefreshCw className="w-3.5 h-3.5" />
                       Trocar

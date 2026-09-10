@@ -9,7 +9,7 @@ export default async function PatientNutritionPlanPage() {
   const plan = result.data || null;
 
   return (
-    <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6">
+    <div className="clinical-surface max-w-5xl w-full mx-auto py-6 sm:py-10 px-4 sm:px-6">
       <PatientPlanClient initialPlan={plan} patientId={user.id} />
     </div>
   );

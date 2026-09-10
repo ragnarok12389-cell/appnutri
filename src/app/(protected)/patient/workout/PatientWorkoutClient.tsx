@@ -26,6 +26,41 @@ interface Props {
   patientId: string;
 }
 
+const OBJECTIVE_LABELS: Record<string, string> = {
+  hypertrophy: 'Ganho de massa muscular',
+  general_fitness: 'Condicionamento geral',
+  strength_foundation: 'Base de força',
+  weight_loss_support: 'Apoio à perda de peso',
+  conditioning_foundation: 'Base de condicionamento',
+};
+
+const EXPERIENCE_LABELS: Record<string, string> = {
+  beginner: 'Iniciante',
+  intermediate: 'Intermediário',
+  advanced: 'Avançado',
+};
+
+const MOVEMENT_LABELS: Record<string, string> = {
+  squat: 'Agachamento', hinge: 'Quadril', push_horizontal: 'Empurrar horizontal',
+  push_vertical: 'Empurrar vertical', pull_horizontal: 'Puxar horizontal',
+  pull_vertical: 'Puxar vertical', lunge: 'Avanço', carry: 'Transporte',
+  core: 'Centro do corpo', isolation: 'Isolamento',
+};
+
+const EQUIPMENT_LABELS: Record<string, string> = {
+  barbell: 'barra', dumbbell: 'halter', cable: 'cabo', machine: 'máquina',
+  bodyweight: 'peso corporal', bench: 'banco', pull_up_bar: 'barra fixa',
+  resistance_band: 'faixa elástica',
+};
+
+function sessionNameInPortuguese(name: string): string {
+  return name
+    .replace('Upper A - Foco Horizontal', 'Parte superior — foco horizontal')
+    .replace('Upper B - Foco Vertical', 'Parte superior — foco vertical')
+    .replace('Lower A - Foco Quadríceps', 'Parte inferior — foco em quadríceps')
+    .replace('Lower B - Foco Posterior', 'Parte inferior — foco posterior');
+}
+
 export function PatientWorkoutClient({ initialProgram, patientId }: Props) {
   const [program] = useState<WorkoutProgram | null>(initialProgram);
   const [selectedDayIndex, setSelectedDayIndex] = useState<number>(0);
@@ -124,8 +159,8 @@ export function PatientWorkoutClient({ initialProgram, patientId }: Props) {
               Programa de Treino Personalizado
             </h1>
             <p className="text-slate-300 text-sm mt-1">
-              Objetivo: <strong className="text-white uppercase">{program.objective}</strong> •{' '}
-              Nível: <strong className="text-white uppercase">{program.experience_level}</strong> •{' '}
+              Objetivo: <strong className="text-white">{OBJECTIVE_LABELS[program.objective] || program.objective}</strong> •{' '}
+              Nível: <strong className="text-white">{EXPERIENCE_LABELS[program.experience_level] || program.experience_level}</strong> •{' '}
               Frequência: <strong className="text-white">{program.sessions_per_week} sessões/semana</strong>
             </p>
           </div>
@@ -188,7 +223,7 @@ export function PatientWorkoutClient({ initialProgram, patientId }: Props) {
               <div className="text-xs font-bold uppercase tracking-wider text-indigo-600">
                 Foco da Sessão
               </div>
-              <h2 className="text-xl font-bold text-slate-900 mt-0.5">{currentSession.name}</h2>
+              <h2 className="text-xl font-bold text-slate-900 mt-0.5">{sessionNameInPortuguese(currentSession.name)}</h2>
               <div className="text-sm text-slate-500 mt-1 flex items-center gap-4">
                 <span>⏱️ Duração estimada: {currentSession.estimated_duration_minutes} min</span>
                 <span>🏋️ Total: {currentSession.exercises.length} exercícios</span>
@@ -230,7 +265,7 @@ export function PatientWorkoutClient({ initialProgram, patientId }: Props) {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 uppercase">
-                          {exercise.movement_pattern}
+                          {MOVEMENT_LABELS[exercise.movement_pattern] || exercise.movement_pattern}
                         </span>
                         {exercise.warmup_sets > 0 && (
                           <span className="text-[11px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md font-medium">
@@ -260,7 +295,7 @@ export function PatientWorkoutClient({ initialProgram, patientId }: Props) {
                     </div>
                     <div className="w-px h-6 bg-slate-200" />
                     <div className="text-center px-2">
-                      <div className="text-[10px] uppercase font-bold text-slate-400">RIR Alvo</div>
+                      <div className="text-[10px] uppercase font-bold text-slate-400">Reserva</div>
                       <div className="text-base font-black text-emerald-600">{exercise.target_rir ?? 2}</div>
                     </div>
                     <div className="w-px h-6 bg-slate-200" />
@@ -313,7 +348,7 @@ export function PatientWorkoutClient({ initialProgram, patientId }: Props) {
                 </span>
                 <h3 className="text-xl font-bold text-slate-900 mt-1">{loggingExercise.exercise_name}</h3>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Meta: {loggingExercise.prescribed_sets} séries de {loggingExercise.min_reps} a {loggingExercise.max_reps} reps (RIR {loggingExercise.target_rir})
+                  Meta: {loggingExercise.prescribed_sets} séries de {loggingExercise.min_reps} a {loggingExercise.max_reps} repetições ({loggingExercise.target_rir} na reserva)
                 </p>
               </div>
               <button
@@ -378,7 +413,7 @@ export function PatientWorkoutClient({ initialProgram, patientId }: Props) {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">RIR Real (Repetições Reserva)</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Repetições que sobraram</label>
                   <input
                     type="number"
                     min="0"
@@ -451,8 +486,8 @@ export function PatientWorkoutClient({ initialProgram, patientId }: Props) {
                     <div>
                       <h4 className="font-bold text-slate-900 text-sm">{opt.exercise_name}</h4>
                       <div className="text-[11px] text-slate-500 mt-0.5">
-                        Padrão: <span className="font-semibold text-slate-700">{opt.movement_pattern}</span> •{' '}
-                        Equipamento: <span className="font-semibold text-slate-700">{opt.required_equipment.join(', ')}</span>
+                        Padrão: <span className="font-semibold text-slate-700">{MOVEMENT_LABELS[opt.movement_pattern] || opt.movement_pattern}</span> •{' '}
+                        Equipamento: <span className="font-semibold text-slate-700">{opt.required_equipment.map((item) => EQUIPMENT_LABELS[item] || item).join(', ')}</span>
                       </div>
                       <div className="flex items-center gap-1.5 mt-1.5">
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">

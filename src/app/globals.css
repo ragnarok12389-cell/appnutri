@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #09090b;
+  --foreground: #f4f4f5;
+  --surface: rgba(24, 24, 27, 0.72);
+  --surface-strong: #18181b;
+  --line: rgba(63, 63, 70, 0.72);
+  --brand: #34d399;
 }
 
 @theme inline {
@@ -12,15 +16,81 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  background-image:
+    radial-gradient(circle at 8% -10%, rgba(16, 185, 129, 0.14), transparent 32rem),
+    radial-gradient(circle at 92% 5%, rgba(14, 165, 233, 0.1), transparent 30rem);
+  background-attachment: fixed;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+button, a, input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, a {
+  touch-action: manipulation;
+}
+
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: -5rem;
+  z-index: 100;
+  border-radius: 0.75rem;
+  background: #34d399;
+  color: #09090b;
+  padding: 0.7rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 800;
+  transition: top 150ms ease;
+}
+
+.skip-link:focus { top: 1rem; }
+
+/* Compatibilidade visual para módulos clínicos criados antes do tema final. */
+.clinical-surface .bg-white { background-color: rgba(24, 24, 27, 0.82) !important; }
+.clinical-surface .bg-gray-50,
+.clinical-surface .bg-slate-50 { background-color: rgba(9, 9, 11, 0.72) !important; }
+.clinical-surface [class*="bg-gray-50"],
+.clinical-surface [class*="bg-gray-100"],
+.clinical-surface [class*="bg-slate-50"],
+.clinical-surface [class*="bg-slate-100"] { background-color: rgba(9, 9, 11, 0.72) !important; }
+.clinical-surface .border-gray-100,
+.clinical-surface .border-gray-200,
+.clinical-surface .border-slate-100,
+.clinical-surface .border-slate-200 { border-color: rgba(63, 63, 70, 0.72) !important; }
+.clinical-surface .text-gray-900,
+.clinical-surface .text-gray-800,
+.clinical-surface .text-slate-900,
+.clinical-surface .text-slate-800 { color: #f4f4f5 !important; }
+.clinical-surface .text-gray-700,
+.clinical-surface .text-gray-600,
+.clinical-surface .text-slate-700,
+.clinical-surface .text-slate-600 { color: #d4d4d8 !important; }
+.clinical-surface .text-gray-500,
+.clinical-surface .text-gray-400,
+.clinical-surface .text-slate-500,
+.clinical-surface .text-slate-400 { color: #a1a1aa !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -301,11 +301,11 @@ export default async function PatientDashboardPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-zinc-400">
             <Sparkles className="w-4 h-4 text-sky-400" />
-            <span>Parâmetros do Motor Nutricional</span>
+            <span>Suas metas diárias</span>
           </div>
           {latestEngineRun && (
             <span className="text-[10px] bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded font-mono">
-              {latestEngineRun.engine_version}
+              Atualizado
             </span>
           )}
         </div>

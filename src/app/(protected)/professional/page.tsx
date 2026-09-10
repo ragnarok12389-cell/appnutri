@@ -11,7 +11,7 @@ export default async function ProfessionalPage() {
   return (
     <div className="flex-1 max-w-5xl w-full mx-auto px-4 py-10 sm:px-6 lg:px-8 space-y-8">
       {/* Header */}
-      <div className="border-b border-zinc-800/80 pb-6 flex items-start justify-between">
+      <div className="border-b border-zinc-800/80 pb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
           <div className="inline-flex items-center space-x-1.5 text-xs font-bold text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20">
             {isNutri ? <Stethoscope className="w-3.5 h-3.5" /> : <Sparkles className="w-3.5 h-3.5" />}
@@ -21,17 +21,17 @@ export default async function ProfessionalPage() {
             Painel do {isNutri ? 'Nutricionista' : 'Influenciador'}
           </h1>
           <p className="text-xs text-zinc-400 mt-1">
-            Gestão restrita aos pacientes explicitamente vinculados através de <code className="text-zinc-300">professional_patient_links</code>.
+            Acompanhe pacientes vinculados, convites e recursos disponíveis para o seu perfil.
           </p>
         </div>
         <div className="flex items-center space-x-3">
           <RoleBadge role={user.profile.role_id} />
           <Link
-            href="/dashboard"
+            href="/professional"
             className="text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-800 bg-zinc-900 px-3 py-1.5 rounded-lg transition-colors flex items-center space-x-1"
           >
             <ArrowLeft className="w-3 h-3" />
-            <span>Dashboard</span>
+            <span>Início</span>
           </Link>
         </div>
       </div>
@@ -93,7 +93,7 @@ export default async function ProfessionalPage() {
       <div className={`p-6 rounded-xl border ${isNutri ? 'border-emerald-500/30 bg-emerald-950/10' : 'border-violet-500/30 bg-violet-950/10'} space-y-3`}>
         <h2 className="text-sm font-bold text-white flex items-center space-x-2">
           {isNutri ? <Stethoscope className="w-4 h-4 text-emerald-400" /> : <Sparkles className="w-4 h-4 text-violet-400" />}
-          <span>Diferenciação Arquitetural: {isNutri ? 'Perfil Clínico' : 'Perfil Influencer'}</span>
+          <span>{isNutri ? 'Responsabilidade clínica' : 'Limites do perfil'}</span>
         </h2>
         <p className="text-xs text-zinc-300 leading-relaxed">
           {isNutri

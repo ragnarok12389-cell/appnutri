@@ -9,18 +9,18 @@ export default async function AdminPage() {
   return (
     <div className="flex-1 max-w-5xl w-full mx-auto px-4 py-10 sm:px-6 lg:px-8 space-y-8">
       {/* Header */}
-      <div className="border-b border-rose-900/30 pb-6 flex items-start justify-between">
+      <div className="border-b border-rose-900/30 pb-6 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5">
         <div>
           <div className="inline-flex items-center space-x-1.5 text-xs font-bold text-rose-400 uppercase tracking-widest bg-rose-500/10 px-2.5 py-1 rounded-md border border-rose-500/20">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Painel Administrativo Restrito</span>
+            <span>Administração</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-white mt-2">Área de Governança e Auditoria</h1>
+          <h1 className="text-3xl font-extrabold text-white mt-2">Central de gestão</h1>
           <p className="text-xs text-zinc-400 mt-1">
-            Esta rota só pode ser acessada por usuários com o papel ADMIN verificado no backend.
+            Gerencie profissionais, produtos, catálogos e registros da plataforma.
           </p>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Link
             href="/admin/products"
             className="text-xs text-amber-400 hover:text-amber-300 border border-amber-500/30 bg-amber-950/30 px-3 py-1.5 rounded-lg transition-colors font-semibold"
@@ -40,10 +40,10 @@ export default async function AdminPage() {
             Provisionar Profissionais
           </Link>
           <Link
-            href="/dashboard"
+            href="/admin"
             className="text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-800 bg-zinc-900 px-3 py-1.5 rounded-lg transition-colors"
           >
-            Voltar ao Dashboard
+            Início
           </Link>
         </div>
       </div>

@@ -9,7 +9,7 @@ export default async function PatientWorkoutPage() {
   const program = result.data || null;
 
   return (
-    <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6">
+    <div className="clinical-surface max-w-5xl w-full mx-auto py-6 sm:py-10 px-4 sm:px-6">
       <PatientWorkoutClient initialProgram={program} patientId={user.id} />
     </div>
   );

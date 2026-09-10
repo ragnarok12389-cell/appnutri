@@ -3,8 +3,11 @@ import './globals.css';
 import { Navbar } from '@/components/layout/Navbar';
 
 export const metadata: Metadata = {
-  title: 'NutriSaaS | Plataforma de Nutrição & Treinamento',
-  description: 'Fundação técnica multi-tenant com segurança RLS, RBAC e auditoria.',
+  title: {
+    default: 'AppNutri | Nutrição e treino em um só lugar',
+    template: '%s | AppNutri',
+  },
+  description: 'Planos personalizados de alimentação e treino, acompanhamento de progresso e orientação com IA.',
 };
 
 export default function RootLayout({
@@ -14,9 +17,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" className="dark bg-zinc-950 text-zinc-100">
-      <body className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100 selection:bg-emerald-500/30 selection:text-emerald-300">
+      <body className="min-h-screen flex flex-col text-zinc-100 selection:bg-emerald-500/30 selection:text-emerald-200">
+        <a href="#conteudo-principal" className="skip-link">Pular para o conteúdo</a>
         <Navbar />
-        <main className="flex-1 flex flex-col">{children}</main>
+        <main id="conteudo-principal" className="flex-1 flex flex-col">{children}</main>
       </body>
     </html>
   );

@@ -15,7 +15,7 @@ export default function RegisterPage() {
           <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center">
             <User className="w-6 h-6" />
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-white">Cadastro de Paciente</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-white">Crie sua conta</h2>
           <p className="text-xs text-zinc-400">
             Crie sua conta para acompanhamento nutricional e físico individual
           </p>
@@ -30,12 +30,14 @@ export default function RegisterPage() {
 
         <form action={formAction} className="space-y-4">
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-zinc-300 block">Nome Completo</label>
+            <label htmlFor="register-name" className="text-xs font-semibold text-zinc-300 block">Nome completo</label>
             <div className="relative">
               <User className="w-4 h-4 text-zinc-500 absolute left-3 top-3.5" />
               <input
                 type="text"
+                id="register-name"
                 name="fullName"
+                autoComplete="name"
                 required
                 placeholder="Ex: Mariana Silva"
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-9 pr-3 py-2.5 text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
@@ -44,12 +46,14 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-zinc-300 block">E-mail</label>
+            <label htmlFor="register-email" className="text-xs font-semibold text-zinc-300 block">E-mail</label>
             <div className="relative">
               <Mail className="w-4 h-4 text-zinc-500 absolute left-3 top-3.5" />
               <input
                 type="email"
+                id="register-email"
                 name="email"
+                autoComplete="email"
                 required
                 placeholder="mariana@exemplo.com"
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-9 pr-3 py-2.5 text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
@@ -58,12 +62,14 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-zinc-300 block">Senha (mínimo 8 caracteres, com letra e número)</label>
+            <label htmlFor="register-password" className="text-xs font-semibold text-zinc-300 block">Senha (mínimo 8 caracteres, com letra e número)</label>
             <div className="relative">
               <Lock className="w-4 h-4 text-zinc-500 absolute left-3 top-3.5" />
               <input
                 type="password"
+                id="register-password"
                 name="password"
+                autoComplete="new-password"
                 required
                 placeholder="••••••••"
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-9 pr-3 py-2.5 text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
@@ -74,7 +80,7 @@ export default function RegisterPage() {
           <div className="p-3 rounded-lg bg-zinc-950/80 border border-zinc-800/80 flex items-start space-x-2.5 text-zinc-400 text-xs">
             <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
             <p className="leading-relaxed">
-              O auto-cadastro público cria contas exclusivamente no papel de <span className="text-zinc-200 font-semibold">Paciente</span>. Contas profissionais (Nutricionista/Influencer) e administrativas são provisionadas via fluxo seguro ou convite.
+              Seus dados ficam protegidos e são usados para personalizar sua experiência. Profissionais entram somente por convite.
             </p>
           </div>
 
@@ -83,7 +89,7 @@ export default function RegisterPage() {
             disabled={isPending}
             className="w-full py-2.5 px-4 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold rounded-lg text-sm flex items-center justify-center space-x-2 transition-all disabled:opacity-50 shadow-md shadow-emerald-950 mt-4"
           >
-            <span>{isPending ? 'Cadastrando...' : 'Concluir Cadastro'}</span>
+            <span>{isPending ? 'Criando conta...' : 'Criar minha conta'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
