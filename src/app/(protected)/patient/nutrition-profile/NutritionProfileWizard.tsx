@@ -36,6 +36,7 @@ import {
   NutritionChallenge,
 } from '@/types/nutrition-profile';
 import { saveNutritionProfileStepAction, completeNutritionProfileAction } from '@/app/actions/nutrition-profile';
+import type { EquipmentType } from '@/types/workout-engine';
 
 interface Props {
   initialProfile: FullPatientNutritionData | null;
@@ -85,6 +86,7 @@ export default function NutritionProfileWizard({ initialProfile }: Props) {
     training_days_per_week: initialProfile?.training_days_per_week ?? 4,
     training_duration_minutes: initialProfile?.training_duration_minutes ?? 60,
     training_types: initialProfile?.training_types ?? ['strength_training'],
+    available_workout_equipment: initialProfile?.available_workout_equipment ?? ['bodyweight'],
 
     desired_meals_per_day: initialProfile?.desired_meals_per_day ?? 4,
     usual_meals_per_day: initialProfile?.usual_meals_per_day ?? 3,
@@ -632,6 +634,50 @@ export default function NutritionProfileWizard({ initialProfile }: Props) {
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                         isSelected
                           ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300'
+                          : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:border-neutral-700'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-neutral-300 mb-1.5">
+                Equipamentos que você realmente tem disponíveis
+              </label>
+              <p className="text-[11px] text-neutral-500 mb-2">
+                O treino será montado somente com as opções marcadas. Peso corporal permanece disponível como base segura.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { id: 'bodyweight', label: 'Peso corporal' },
+                  { id: 'dumbbell', label: 'Halteres' },
+                  { id: 'barbell', label: 'Barra e anilhas' },
+                  { id: 'machine', label: 'Máquinas' },
+                  { id: 'cable', label: 'Polia / cabo' },
+                  { id: 'bench', label: 'Banco' },
+                  { id: 'pull_up_bar', label: 'Barra fixa' },
+                  { id: 'resistance_band', label: 'Faixa elástica' },
+                ].map((item) => {
+                  const current = formData.available_workout_equipment || ['bodyweight'];
+                  const equipmentId = item.id as EquipmentType;
+                  const isSelected = current.includes(equipmentId);
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        const next = isSelected
+                          ? current.filter((value) => value !== item.id)
+                          : [...current, equipmentId];
+                        if (next.length > 0) setFormData({ ...formData, available_workout_equipment: next });
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                        isSelected
+                          ? 'bg-sky-500/20 border-sky-500 text-sky-300'
                           : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:border-neutral-700'
                       }`}
                     >
@@ -1264,7 +1310,7 @@ export default function NutritionProfileWizard({ initialProfile }: Props) {
                 disabled={isPending}
                 className="w-full sm:w-auto px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold rounded-xl text-sm transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50 shrink-0"
               >
-                {isPending ? 'Congelando versão...' : 'Finalizar Perfil Nutricional'}
+                {isPending ? 'Gerando dieta e treino...' : 'Finalizar e Gerar Meus Planos'}
               </button>
             </div>
           </div>

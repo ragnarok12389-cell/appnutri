@@ -20,6 +20,7 @@ import { evaluatePlanPricing } from '@/lib/diet-composer/budget';
 import { PRICE_ENGINE_VERSION } from '@/lib/foods/pricing-config';
 import { DietMealItemSnapshot, DietMealType, DietPlan, FoodSubstitutionOption } from '@/types/diet-plan';
 import { NutritionConstraints } from '@/types/nutrition-engine';
+import { readCanonicalFoodNutrients } from '@/lib/diet-composer/catalog-mapping';
 
 interface RawFoodNutrient {
   amount_per_100g: number | null;
@@ -244,13 +245,7 @@ export async function generateDietPlanAction(
       sourceChecksum = f.food_data_sources.checksum;
     }
 
-    const nutrientsMap: Record<string, number> = {};
-    for (const fn of f.food_nutrients || []) {
-      const code = fn.nutrients?.code;
-      if (code && fn.amount_per_100g !== null) {
-        nutrientsMap[code] = Number(fn.amount_per_100g);
-      }
-    }
+    const nutrients = readCanonicalFoodNutrients(f.food_nutrients || []);
 
     const tagsMap: Record<string, 'true' | 'false' | 'unknown'> = {};
     for (const ft of f.food_tag_mappings || []) {
@@ -285,12 +280,7 @@ export async function generateDietPlanAction(
       source_version: sourceVersion,
       validation_status: f.validation_status,
       preparation_state: f.preparation_state,
-      energy_kcal_100g: nutrientsMap['energy_kcal'] ?? 0,
-      protein_g_100g: nutrientsMap['protein'] ?? 0,
-      carbohydrate_g_100g: nutrientsMap['carbohydrate'] ?? 0,
-      fat_g_100g: nutrientsMap['lipids'] ?? 0,
-      fiber_g_100g: nutrientsMap['dietary_fiber'] ?? null,
-      sodium_mg_100g: nutrientsMap['sodium'] ?? null,
+      ...nutrients,
       household_measure: hm ? { label: hm.label, grams: Number(hm.grams) } : null,
       tags: tagsMap,
       role: 'other', // inferido no filtro

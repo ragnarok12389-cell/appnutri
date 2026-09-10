@@ -36,6 +36,7 @@ export async function generateWorkoutProgramAction(
     experience_level: WorkoutExperienceLevel;
     sessions_per_week: number;
     session_duration_minutes?: number;
+    source_profile_version?: number;
     constraints?: Partial<WorkoutConstraints>;
   }
 ): Promise<ActionResponse<{ programId: string; generation_status: string; output_program_hash: string }>> {
@@ -98,7 +99,7 @@ export async function generateWorkoutProgramAction(
     session_duration_minutes: params.session_duration_minutes ?? 60,
     constraints: defaultConstraints,
     catalog: catalog,
-    source_profile_version: 1,
+    source_profile_version: params.source_profile_version ?? 1,
     generation_reference_at: new Date().toISOString(),
   };
 

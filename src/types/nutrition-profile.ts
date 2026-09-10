@@ -82,6 +82,7 @@ export interface PatientNutritionProfile {
   training_days_per_week: number | null;
   training_duration_minutes: number | null;
   training_types: string[];
+  available_workout_equipment: import('@/types/workout-engine').EquipmentType[];
 
   // 5. Refeições e Contexto
   desired_meals_per_day: number | null;

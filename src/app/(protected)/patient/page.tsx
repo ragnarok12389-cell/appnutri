@@ -87,6 +87,25 @@ export default async function PatientDashboardPage() {
     .limit(1)
     .maybeSingle();
 
+  const [{ data: latestDietPlan }, { data: latestWorkoutProgram }, { data: latestActivation }] = await Promise.all([
+    supabase.from('diet_plans').select('id, generation_status, approval_status, is_active').eq('patient_id', user.id).order('created_at', { ascending: false }).limit(1).maybeSingle(),
+    supabase.from('workout_programs').select('id, generation_status, approval_status, is_active').eq('patient_id', user.id).order('created_at', { ascending: false }).limit(1).maybeSingle(),
+    supabase.from('patient_plan_activations').select('nutrition_status, diet_status, workout_status, messages, completed_at').eq('patient_id', user.id).order('profile_version', { ascending: false }).limit(1).maybeSingle(),
+  ]);
+
+  const dietFailed = latestActivation?.diet_status === 'failed' || latestActivation?.diet_status === 'not_eligible';
+  const workoutFailed = latestActivation?.workout_status === 'failed';
+  const dietReviewRequired = latestActivation?.diet_status === 'review_required';
+  const workoutReviewRequired = latestActivation?.workout_status === 'review_required';
+  const workoutNeedsConfiguration = latestActivation?.workout_status === 'needs_configuration';
+  const needsHistoricalActivation = Boolean(nutritionProfile?.is_completed && !latestActivation);
+  const dietHref = latestDietPlan?.is_active || dietReviewRequired
+    ? '/patient/nutrition/plan'
+    : '/patient/nutrition-profile';
+  const workoutHref = latestWorkoutProgram?.is_active || workoutReviewRequired
+    ? '/patient/workout'
+    : '/patient/nutrition-profile';
+
   const prof = link?.professional_profiles as unknown as {
     professional_type: string;
     license_number: string | null;
@@ -247,7 +266,7 @@ export default async function PatientDashboardPage() {
             </h2>
             <p className="text-xs text-zinc-400 max-w-xl">
               {nutritionProfile?.is_completed
-                ? 'Suas preferências, rotina, restrições e orçamento alimentar estão registrados e prontos para embasar sua futura prescrição dietética.'
+                ? 'Suas preferências, rotina, restrições e orçamento estão registrados para gerar seus planos personalizados.'
                 : 'Responda ao questionário completo de 8 etapas para informar seus hábitos, alimentos favoritos, aversões e orçamento alimentar.'}
             </p>
 
@@ -349,51 +368,51 @@ export default async function PatientDashboardPage() {
         )}
       </div>
 
-      {/* Seção de Funcionalidades Futuras (Placeholders Claramente Indisponíveis / Em Breve) */}
+      {/* Módulos liberados pelo perfil e pelos gates determinísticos */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold text-white">Módulos de Acompanhamento</h2>
           <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">
-            Etapas Futuras do Produto
+            Jornada personalizada
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Minha Dieta */}
-          <div className="p-5 rounded-2xl border border-zinc-800/80 bg-zinc-950/40 relative overflow-hidden space-y-3">
+          <Link href={dietHref} className="p-5 rounded-2xl border border-zinc-800/80 bg-zinc-950/40 hover:border-emerald-500/30 relative overflow-hidden space-y-3 transition-colors">
             <div className="flex items-center justify-between">
               <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-500">
                 <Apple className="w-5 h-5" />
               </div>
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-zinc-900 border border-zinc-800 text-zinc-400">
-                Em breve
+              <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${latestDietPlan?.is_active ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : dietReviewRequired ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' : dietFailed ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' : 'bg-zinc-900 border-zinc-800 text-zinc-400'}`}>
+                {latestDietPlan?.is_active ? 'Disponível' : dietReviewRequired ? 'Em revisão' : dietFailed ? 'Requer atenção' : needsHistoricalActivation ? 'Gerar planos' : nutritionProfile?.is_completed ? 'Processando' : 'Bloqueado'}
               </span>
             </div>
             <div>
               <h3 className="text-sm font-bold text-zinc-300">Minha Dieta</h3>
               <p className="text-[11px] text-zinc-500 mt-1 leading-relaxed">
-                Plano alimentar individualizado com controle de refeições e macros (Etapa 3).
+                {latestDietPlan?.is_active ? 'Veja suas refeições, porções, macros e substituições.' : dietReviewRequired ? 'Seu plano aguarda validação profissional antes da liberação.' : dietFailed ? 'Revise os dados do perfil ou procure o profissional responsável.' : needsHistoricalActivation ? 'Revise o perfil já preenchido e finalize para gerar dieta e treino.' : nutritionProfile?.is_completed ? 'Seu perfil foi concluído e o plano está sendo preparado.' : 'Conclua o perfil nutricional de 8 etapas para liberar este módulo.'}
               </p>
             </div>
-          </div>
+          </Link>
 
           {/* Meu Treino */}
-          <div className="p-5 rounded-2xl border border-zinc-800/80 bg-zinc-950/40 relative overflow-hidden space-y-3">
+          <Link href={workoutHref} className="p-5 rounded-2xl border border-zinc-800/80 bg-zinc-950/40 hover:border-sky-500/30 relative overflow-hidden space-y-3 transition-colors">
             <div className="flex items-center justify-between">
               <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-500">
                 <Dumbbell className="w-5 h-5" />
               </div>
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-zinc-900 border border-zinc-800 text-zinc-400">
-                Em breve
+              <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${latestWorkoutProgram?.is_active ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : workoutReviewRequired ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' : workoutFailed ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' : 'bg-zinc-900 border-zinc-800 text-zinc-400'}`}>
+                {latestWorkoutProgram?.is_active ? 'Disponível' : workoutReviewRequired ? 'Em revisão' : workoutFailed ? 'Requer atenção' : workoutNeedsConfiguration ? 'Configurar' : needsHistoricalActivation ? 'Gerar planos' : nutritionProfile?.is_completed ? 'Processando' : 'Bloqueado'}
               </span>
             </div>
             <div>
               <h3 className="text-sm font-bold text-zinc-300">Meu Treino</h3>
               <p className="text-[11px] text-zinc-500 mt-1 leading-relaxed">
-                Fichas de treinamento e divisão de exercícios prescritas pelo profissional.
+                {latestWorkoutProgram?.is_active ? 'Abra sua semana de treinos e registre séries e cargas.' : workoutReviewRequired ? 'O programa aguarda revisão antes da liberação.' : workoutFailed ? 'O programa não pôde ser gerado com os dados atuais.' : workoutNeedsConfiguration ? 'Informe ao menos dois dias semanais no perfil para gerar o treino.' : needsHistoricalActivation ? 'Revise o perfil já preenchido e finalize para gerar dieta e treino.' : nutritionProfile?.is_completed ? 'Seu programa está sendo preparado.' : 'Conclua o perfil nutricional de 8 etapas para liberar este módulo.'}
               </p>
             </div>
-          </div>
+          </Link>
 
           {/* Acompanhamento */}
           <Link href="/patient/progress" className="p-5 rounded-2xl border border-emerald-500/30 bg-emerald-950/10 hover:bg-emerald-950/20 relative overflow-hidden space-y-3 transition-colors">
@@ -413,23 +432,23 @@ export default async function PatientDashboardPage() {
             </div>
           </Link>
 
-          {/* Evolução */}
-          <div className="p-5 rounded-2xl border border-zinc-800/80 bg-zinc-950/40 relative overflow-hidden space-y-3">
+          {/* AI Companion */}
+          <Link href="/patient/assistant" className="p-5 rounded-2xl border border-sky-500/20 bg-sky-950/10 hover:bg-sky-950/20 relative overflow-hidden space-y-3 transition-colors">
             <div className="flex items-center justify-between">
               <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-500">
-                <TrendingUp className="w-5 h-5" />
+                <TrendingUp className="w-5 h-5 text-sky-400" />
               </div>
               <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-zinc-900 border border-zinc-800 text-zinc-400">
-                Em breve
+                Disponível
               </span>
             </div>
             <div>
-              <h3 className="text-sm font-bold text-zinc-300">Evolução Corporal</h3>
+              <h3 className="text-sm font-bold text-zinc-300">Acompanhamento com IA</h3>
               <p className="text-[11px] text-zinc-500 mt-1 leading-relaxed">
-                Gráficos de peso, medidas corporais e histórico comparativo.
+                Converse sobre sua rotina, dieta, treino e evolução usando o contexto oficial do seu plano.
               </p>
             </div>
-          </div>
+          </Link>
         </div>
       </div>
     </div>

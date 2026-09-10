@@ -24,4 +24,8 @@ Fechar a jornada do paciente entre o questionário de oito etapas, a liberação
 
 ## Estado atual
 
-A fundação de mídia e visão foi entregue na migração 21, com interface em `/patient/progress`. A integração automática do questionário com dieta e treino permanece como próximo bloco da Etapa 11.
+A fundação de mídia e visão foi entregue na migração 21, com interface em `/patient/progress`.
+
+A ativação automática foi entregue na migração 22 e no serviço `plan-activation`: ao concluir a etapa 8, o backend cria uma nova versão imutável do perfil, executa o motor nutricional, compõe a dieta e monta o treino com os equipamentos declarados. O resultado por versão fica persistido para o painel distinguir processamento, revisão, configuração necessária e falha. Perfis concluídos antes da migração recebem uma chamada clara para revisar e gerar os planos.
+
+O código da Etapa 11 está concluído. A análise real de fotos de refeições depende apenas da configuração externa de `GEMINI_API_KEY`; sem a chave, o endpoint permanece indisponível de forma explícita e não fabrica resultados.

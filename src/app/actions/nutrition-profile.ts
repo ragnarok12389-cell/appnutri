@@ -16,9 +16,11 @@ import {
 } from '@/lib/validations/nutrition-profile';
 import {
   PatientNutritionProfile,
+  PatientNutritionSensitive,
   PatientNutritionSnapshot,
   FullPatientNutritionData,
 } from '@/types/nutrition-profile';
+import { activatePlansAfterCompletedProfile, PlanActivationResult } from '@/lib/plan-activation/service';
 
 export interface ActionResponse<T = unknown> {
   success?: boolean;
@@ -191,7 +193,7 @@ export async function saveNutritionProfileStepAction(
  */
 export async function completeNutritionProfileAction(
   targetPatientId?: string
-): Promise<ActionResponse<{ version: number; snapshotId: string }>> {
+): Promise<ActionResponse<{ version: number; snapshotId: string; activation: PlanActivationResult }>> {
   const user = await getCurrentUser();
   if (!user) {
     return { error: 'Acesso não autorizado: autenticação requerida.' };
@@ -259,8 +261,9 @@ export async function completeNutritionProfileAction(
     .eq('patient_id', patientId)
     .maybeSingle();
 
+  let sensitiveSnapshotId: string | null = null;
   if (sensitiveData) {
-    await supabase
+    const { data: sensitiveSnapshot, error: sensitiveSnapshotError } = await supabase
       .from('patient_nutrition_sensitive_snapshots')
       .insert({
         patient_id: patientId,
@@ -272,7 +275,13 @@ export async function completeNutritionProfileAction(
           clinical_dietary_restrictions: sensitiveData.clinical_dietary_restrictions,
         },
         created_by: user.id,
-      });
+      })
+      .select('id')
+      .single();
+    if (sensitiveSnapshotError || !sensitiveSnapshot) {
+      return { error: 'Erro ao registrar o histórico clínico protegido do perfil.' };
+    }
+    sensitiveSnapshotId = sensitiveSnapshot?.id ?? null;
   }
 
   // 4. Auditoria
@@ -298,11 +307,21 @@ export async function completeNutritionProfileAction(
     },
   });
 
+  const activation = await activatePlansAfterCompletedProfile({
+    patientId,
+    actorId: user.id,
+    profile: { ...profile, is_completed: true, version: newVersion } as PatientNutritionProfile,
+    sensitive: sensitiveData as PatientNutritionSensitive | null,
+    snapshotId: snapshot.id,
+    sensitiveSnapshotId,
+  });
+
   return {
     success: true,
     data: {
       version: newVersion,
       snapshotId: snapshot.id,
+      activation,
     },
   };
 }

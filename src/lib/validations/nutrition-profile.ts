@@ -40,6 +40,16 @@ export const step3RoutineSchema = z.object({
   training_days_per_week: z.number().int().min(0).max(7).optional().nullable(),
   training_duration_minutes: z.number().int().min(0).max(360).optional().nullable(),
   training_types: z.array(z.string()).default([]),
+  available_workout_equipment: z.array(z.enum([
+    'barbell',
+    'dumbbell',
+    'cable',
+    'machine',
+    'bodyweight',
+    'bench',
+    'pull_up_bar',
+    'resistance_band',
+  ])).min(1, 'Selecione ao menos uma opção de equipamento').default(['bodyweight']),
 });
 
 // Step 4: Sua alimentação & refeições
