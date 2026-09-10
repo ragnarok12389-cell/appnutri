@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
       output: executionResult.output,
     });
   } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : 'Erro interno ao processar confirmação';
-    return NextResponse.json({ error: errorMsg }, { status: 500 });
+    console.error('AI Companion confirmation failed', err instanceof Error ? err.name : 'UnknownError');
+    return NextResponse.json({ error: 'Não foi possível processar a confirmação agora.' }, { status: 500 });
   }
 }

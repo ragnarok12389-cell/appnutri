@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Navbar } from '@/components/layout/Navbar';
+import { Footer } from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
   title: {
@@ -21,6 +22,7 @@ export default function RootLayout({
         <a href="#conteudo-principal" className="skip-link">Pular para o conteúdo</a>
         <Navbar />
         <main id="conteudo-principal" className="flex-1 flex flex-col">{children}</main>
+        <Footer />
       </body>
     </html>
   );

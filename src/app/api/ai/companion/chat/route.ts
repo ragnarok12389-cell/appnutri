@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(result);
   } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : 'Erro interno no servidor';
-    return NextResponse.json({ error: errorMsg }, { status: 500 });
+    console.error('AI Companion request failed', err instanceof Error ? err.name : 'UnknownError');
+    return NextResponse.json({ error: 'Não foi possível concluir a solicitação agora.' }, { status: 500 });
   }
 }

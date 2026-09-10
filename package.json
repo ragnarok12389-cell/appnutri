@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "gate": "npm test && npx tsc --noEmit && npm run lint && npm run build",
+    "check:production-env": "node scripts/check-production-env.mjs",
+    "audit:hosted": "node scripts/audit-hosted-supabase.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.6",

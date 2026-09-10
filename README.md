@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AppNutri
 
-## Getting Started
+Plataforma de alimentação, treino e acompanhamento com motores determinísticos, isolamento multi-tenant no Supabase e assistência contextual por IA.
 
-First, run the development server:
+## Requisitos
+
+- Node.js compatível com Next.js 16;
+- projeto Supabase com as migrations de `supabase/migrations` aplicadas;
+- credenciais indicadas em `.env.example`;
+- chave Gemini para Companion e análise visual de refeições.
+
+## Desenvolvimento
 
 ```bash
+npm install
+copy .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+O exemplo de ambiente contém apenas placeholders. Nunca versione `.env.local` ou chaves reais.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Gates obrigatórios
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run gate
+```
 
-## Learn More
+Esse comando executa testes, TypeScript, ESLint e build em sequência. A execução sequencial evita contenção no teste combinatório do motor nutricional.
 
-To learn more about Next.js, take a look at the following resources:
+Antes de publicar, carregue as variáveis do ambiente de produção e execute:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run check:production-env
+npm run audit:hosted
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+O validador não imprime os valores das credenciais.
 
-## Deploy on Vercel
+## Rotas operacionais
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `GET /api/health`: liveness sem consulta a dados ou exposição de segredos;
+- `/privacy`: aviso preliminar de privacidade;
+- `/terms`: termos preliminares de uso.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Publicação
+
+1. Aplicar todas as migrations no projeto Supabase de destino na ordem dos nomes.
+2. Configurar as cinco variáveis obrigatórias listadas em `.env.example`.
+3. Ajustar `NEXT_PUBLIC_SITE_URL` para o domínio HTTPS definitivo.
+4. Cadastrar o domínio nas URLs permitidas do Supabase Auth.
+5. Executar `npm run check:production-env` e `npm run gate`.
+6. Publicar uma versão de preview e validar cadastro, login, questionário, dieta, treino, progresso, fotos e IA.
+7. Obter revisão jurídica dos textos preliminares antes da abertura pública.
+
+## Documentação técnica
+
+- `APPNUTRI_HANDOFF.md`: arquitetura e decisões herdadas;
+- `REVISAO_ETAPA_12_COMPLETA.md`: gate final do roadmap;
+- `supabase/migrations`: histórico canônico do banco e das políticas RLS.

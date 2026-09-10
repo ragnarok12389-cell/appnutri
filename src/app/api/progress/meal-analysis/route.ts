@@ -17,6 +17,20 @@ export async function POST(request: NextRequest) {
   if (validationError) return NextResponse.json({ error: validationError }, { status: 400 });
 
   const admin = createAdminClient();
+  const rateWindowStart = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const { count: recentAnalysisCount, error: rateError } = await admin
+    .from('meal_photo_analyses')
+    .select('id', { count: 'exact', head: true })
+    .eq('patient_id', user.id)
+    .gte('created_at', rateWindowStart);
+  if (rateError) return NextResponse.json({ error: 'Não foi possível validar o limite de análises.' }, { status: 503 });
+  if ((recentAnalysisCount ?? 0) >= 10) {
+    return NextResponse.json(
+      { error: 'Você atingiu o limite de análises desta hora. Tente novamente mais tarde.' },
+      { status: 429, headers: { 'Retry-After': '3600' } }
+    );
+  }
+
   const id = crypto.randomUUID();
   const bytes = new Uint8Array(await file.arrayBuffer());
   if (!hasValidImageSignature(bytes, file.type)) return NextResponse.json({ error: 'O conteúdo do arquivo não corresponde a uma imagem válida.' }, { status: 400 });
