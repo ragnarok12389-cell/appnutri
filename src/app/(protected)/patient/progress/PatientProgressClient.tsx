@@ -33,6 +33,16 @@ const checkpointLabels: Record<ProgressPhotoCheckpoint, string> = {
   start: 'Estado inicial', midpoint: 'Meio do caminho', goal: 'Objetivo alcançado',
 };
 
+const dataQualityLabels: Record<string, string> = {
+  insufficient: 'Dados insuficientes',
+  partial: 'Parcial',
+  sufficient: 'Suficiente',
+};
+
+const proposalDomainLabels: Record<string, string> = {
+  general: 'Geral', nutrition: 'Alimentação', workout: 'Treino', recovery: 'Recuperação',
+};
+
 export function PatientProgressClient({ initialData, initialError, initialProgressPhotos, initialMealPhotos }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -138,7 +148,7 @@ export function PatientProgressClient({ initialData, initialError, initialProgre
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5"><span className="text-xs text-zinc-500">Check-ins analisados</span><div className="mt-1 text-2xl font-bold">{metrics?.check_in_count ?? 0}</div></div>
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5"><span className="text-xs text-zinc-500">Treinos realizados</span><div className="mt-1 text-2xl font-bold">{metrics?.workouts_completed ?? 0}</div></div>
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5"><span className="text-xs text-zinc-500">Variação de peso</span><div className="mt-1 text-2xl font-bold">{metrics?.weight_change_kg == null ? '—' : `${metrics.weight_change_kg > 0 ? '+' : ''}${metrics.weight_change_kg} kg`}</div></div>
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5"><span className="text-xs text-zinc-500">Qualidade dos dados</span><div className="mt-2 text-sm font-bold capitalize text-emerald-400">{initialData.latest_analysis?.data_quality ?? 'Aguardando dados'}</div></div>
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5"><span className="text-xs text-zinc-500">Qualidade dos dados</span><div className="mt-2 text-sm font-bold text-emerald-400">{initialData.latest_analysis?.data_quality ? dataQualityLabels[initialData.latest_analysis.data_quality] : 'Aguardando dados'}</div></div>
         </section>
 
         <section className="grid gap-6 lg:grid-cols-2">
@@ -194,7 +204,7 @@ export function PatientProgressClient({ initialData, initialError, initialProgre
               <div className="mt-4 space-y-3">
                 {initialData.proposals.length === 0 ? <p className="text-sm text-zinc-500">Nenhuma proposta de revisão no momento.</p> : initialData.proposals.slice(0, 6).map((proposal) => (
                   <div key={proposal.id} className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-3">
-                    <div className="flex items-center justify-between gap-2"><span className="text-xs font-bold uppercase text-zinc-400">{proposal.domain}</span><span className={proposal.priority === 'high' ? 'text-xs text-amber-400' : 'text-xs text-zinc-500'}>{proposal.status === 'pending_review' ? 'Aguardando revisão' : 'Revisada'}</span></div>
+                    <div className="flex items-center justify-between gap-2"><span className="text-xs font-bold uppercase text-zinc-400">{proposalDomainLabels[proposal.domain] || proposal.domain}</span><span className={proposal.priority === 'high' ? 'text-xs text-amber-400' : 'text-xs text-zinc-500'}>{proposal.status === 'pending_review' ? 'Aguardando revisão' : 'Revisada'}</span></div>
                     <p className="mt-2 text-sm text-zinc-300">{proposal.summary}</p>
                   </div>
                 ))}

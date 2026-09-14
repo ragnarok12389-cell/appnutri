@@ -194,7 +194,7 @@ export default function PatientAssistantPage() {
               <div className="flex items-center gap-2">
                 <h1 className="font-semibold text-slate-100">AI Companion</h1>
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                  <ShieldCheck className="w-3 h-3" /> Seguro & Scoped
+                  <ShieldCheck className="w-3 h-3" /> Contexto seguro
                 </span>
               </div>
               <p className="text-xs text-slate-400">Contexto oficial do seu plano e treino</p>
